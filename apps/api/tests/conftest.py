@@ -37,7 +37,7 @@ def make_workspace(db_session):
 
 @pytest.fixture(autouse=True)
 def _hermetic_settings():
-    # The dev .env points at prod config (context engine ON, real Slack creds).
+    # A developer's local .env may enable real integrations (context engine, Slack).
     # Force the test-relevant flags to their defaults so the suite doesn't depend
     # on whatever the local .env carries. Tests that need the real path opt in via
     # their own monkeypatch (e.g. the scip-fallback test).

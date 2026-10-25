@@ -43,9 +43,9 @@ async def test_export_job_model_roundtrips_expires_at(db_session, make_workspace
 
 
 async def _run_job(db_session, job_id: str, project_ids=None) -> None:
-    """Drive the background render directly (deterministic in tests — see the
-    gigsnano-api-bg-session-prod-db memory on why `run_export_in_fresh_session`
-    binds to the request session's engine rather than the module async_session())."""
+    """Drive the background render directly (deterministic in tests).
+    `run_export_in_fresh_session` binds to the request session's engine rather than
+    the module async_session(), so it uses the test engine here."""
     await run_export_in_fresh_session(db_session.bind, job_id, project_ids, FakeEmailProvider())
 
 

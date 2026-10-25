@@ -15,6 +15,8 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Protected environment: add required reviewers in repo settings -> Environments.
+    environment: npm
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -22,7 +24,7 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
-      - run: npm install -g npm@latest   # trusted publishing needs npm >= 11.5
+      - run: npm install -g npm@12.2.1   # trusted publishing needs npm >= 11.5; pinned
       - run: pnpm install --frozen-lockfile
       - name: Resolve package
         id: pkg

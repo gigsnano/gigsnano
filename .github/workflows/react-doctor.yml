@@ -43,4 +43,3 @@ jobs:
         with:
           blocking: error
           directory: apps/web
-          project: "@gigsnano/web"

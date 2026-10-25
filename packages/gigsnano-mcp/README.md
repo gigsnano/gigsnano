@@ -29,7 +29,7 @@ From the repo root:
 
 ```bash
 pnpm install
-pnpm --filter gigsnano-mcp build
+pnpm --filter @gigsnano/mcp build
 ```
 
 This compiles `src/` to `packages/gigsnano-mcp/dist/index.js`.
@@ -106,7 +106,7 @@ launches it automatically:
 Use the **absolute path** to the built `dist/index.js`, not a repo-relative
 one — you'll typically add this `.mcp.json` in a *different* repo (the one
 you're actually coding in), where a relative `./packages/...` path doesn't
-exist. Once `gigsnano-mcp` is published to npm, `npx gigsnano-mcp` will
+exist. Once `@gigsnano/mcp` is published to npm, `npx @gigsnano/mcp` will
 replace the `node`/absolute-path pair here.
 
 Restart Claude Code (or reload MCP servers) after editing `.mcp.json`. The

@@ -2,8 +2,8 @@
 BackgroundTasks job: create_export returns a PENDING job immediately and schedules
 run_export_in_fresh_session, which renders + flips the job to READY (or FAILED on
 error) on its own DB session (mirrors workspace/clone.py's fresh-session pattern —
-see gigsnano-api-bg-session-prod-db memory for why it binds to `db.bind` rather than
-the module-level `async_session()`). XLSX is stored base64-encoded in the same
+it binds to `db.bind` rather than the module-level `async_session()` so tests, whose
+request session uses an overridden engine, never reach the production database). XLSX is stored base64-encoded in the same
 `content` Text column csv/json already use (no new binary column / object storage).
 Download links expire `expires_at` days after creation (410 Gone past that).
 Frontend contract: src/types/integrations/export.ts + src/services/integrations/export.service.ts."""
