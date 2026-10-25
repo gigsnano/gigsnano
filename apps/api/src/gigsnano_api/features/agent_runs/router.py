@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from gigsnano_api.billing.entitlements import check_entitlement
+from gigsnano_api.billing.entitlements import check_entitlement, effective_tier
 from gigsnano_api.billing.metering import meter
 from gigsnano_api.billing.subscriptions import get_or_create_subscription
 from gigsnano_api.core.db import get_db
@@ -228,7 +228,7 @@ async def coordinate_story(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Invalid autonomy '{payload.autonomy}'")
     ws_id = billing_workspace_id(route)
     sub = await get_or_create_subscription(db, ws_id)
-    if not check_entitlement(sub.tier, "task_router"):  # auto-route is Business (GIN-234)
+    if not check_entitlement(effective_tier(sub.tier), "task_router"):  # auto-route is Business (GIN-234)
         raise HTTPException(status.HTTP_402_PAYMENT_REQUIRED, "Auto-route requires the Business plan.")
     await meter(db, ws_id, "agent_runs")  # a coordinate starts a run — metered + quota-enforced
     try:
