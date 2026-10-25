@@ -6,7 +6,7 @@
 # arrive as --build-arg; changing them means rebuilding the image.
 # Debian slim base (glibc) — avoids sharp's musl/alpine native-binary friction.
 
-FROM node:22-bookworm-slim AS base
+FROM node:26-bookworm-slim AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@10.34.4 --activate
