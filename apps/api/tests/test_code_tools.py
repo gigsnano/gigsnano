@@ -100,8 +100,10 @@ async def test_code_grep_does_not_follow_symlink_escape(db_session, tmp_path):
     reg = build_code_tools_registry()
     ctx = ToolContext(db=db_session, workspace=ws, user=None, role="owner")
     res = await reg.get("code_grep").handler(ctx, {"project_id": proj.id, "pattern": "SECRET"})
-    assert "SECRET" not in res.content
+    # The reply echoes the pattern ("No matches for 'SECRET'"), so check the
+    # file's contents and name never appear, not the bare word.
     assert "do-not-leak" not in res.content
+    assert "leak.py" not in res.content
 
 
 async def test_read_file_rejects_absolute_path(db_session, tmp_path):
