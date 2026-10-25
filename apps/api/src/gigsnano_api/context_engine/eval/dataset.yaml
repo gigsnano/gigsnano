@@ -1,0 +1,125 @@
+# Golden repo/doc-QA cases for the SP3 harness (see scoring.Case for the schema).
+#
+# Target: gigsnano-v2 @ eval_target_sha 961c60f585bd30558cef1b3668b213ecbd6afdb9
+# (set eval_target_sha to this and check the target repo out at it before running,
+#  or re-author expect_citations against a newer SHA).
+#
+# expect_citations.files = file paths the answer MUST cite (gating). expect_tools is
+# a soft signal (reported, not gating). rubric grades correctness/grounding via the judge.
+cases:
+  - id: google-signin-frontend
+    question: "How does Google sign-in work on the frontend?"
+    surface: gigs_ai
+    expect_citations:
+      files:
+        - src/components/auth/google-sign-in-button.tsx
+        - src/lib/auth/google-config.ts
+    expect_tools: [search_symbols]
+    rubric: >
+      Must describe the Google Identity Services (GSI) sign-in button and that the client
+      id comes from config, and that the button self-hides / is disabled when the client id
+      is unset. Must NOT claim Firebase is used.
+
+  - id: breadcrumbs-generation
+    question: "How are the navigation breadcrumbs generated?"
+    surface: gigs_ai
+    expect_citations:
+      files:
+        - src/components/layout/breadcrumbs.tsx
+        - src/hooks/ui/use-breadcrumbs.ts
+        - src/constants/route-labels.ts
+    expect_tools: [search_symbols, find_callers]
+    rubric: >
+      Must explain that breadcrumbs are route-driven via a useBreadcrumbs hook plus a
+      ROUTE_LABELS registry, and that the dynamic project segment resolves to the project name.
+
+  - id: mock-vs-real-api
+    question: "How does the app decide whether a request hits the real API or a mock?"
+    surface: gigs_ai
+    expect_citations:
+      files:
+        - src/services/mock-fallback.ts
+    expect_tools: [search_symbols]
+    rubric: >
+      Must describe a per-path decision (shouldUseMock by method + path) with a denylist of
+      not-yet-backed domains, rather than a single global boolean.
+
+  - id: sprint-zero-seed
+    question: "What BMAD steps are seeded into Sprint-0 when a project is created?"
+    surface: gigs_ai
+    expect_citations:
+      files:
+        - src/mocks/data/stories.ts
+    expect_tools: [search_symbols, read_symbol]
+    rubric: >
+      Must explain that creating a project seeds a Sprint-0 cycle with the BMAD planning
+      stories (brief/PRD/architecture/epics-stories/sprint-planning etc.), via a
+      makeSprintZeroStories-style seed.
+
+  - id: chat-citations
+    question: "How are the clickable code citations in chat parsed and rendered?"
+    surface: gigs_ai
+    expect_citations:
+      files:
+        - src/lib/chat/citation.ts
+        - src/components/ai/chat/citation.tsx
+    expect_tools: [search_symbols, find_callers]
+    rubric: >
+      Must describe parsing citation hrefs ([file:line] / [doc:Title]) into a spec and
+      rendering them as interactive pills with a code/doc peek.
+
+  - id: rich-editor
+    question: "What rich-text editor does the app use and how is it composed?"
+    surface: gigs_ai
+    expect_citations:
+      files:
+        - src/components/editor/rich-editor.tsx
+    expect_tools: [search_symbols]
+    rubric: >
+      Must identify TipTap/ProseMirror as the editor, composed headlessly (StarterKit plus a
+      slash command and a selection bubble menu), value/onChange driven.
+
+  - id: kanban-board
+    question: "How does the kanban board group and render stories?"
+    surface: bmad_story
+    expect_citations:
+      files:
+        - src/components/board/kanban/kanban-board.tsx
+    expect_tools: [search_symbols]
+    rubric: >
+      Must explain that the board groups stories by their status (EStoryStatus) into columns
+      and renders a card per story.
+
+  - id: projects-data-flow
+    question: "How does the app fetch the list of projects end to end?"
+    surface: gigs_ai
+    expect_citations:
+      files:
+        - src/services/project/project.service.ts
+        - src/hooks/project/use-projects.ts
+    expect_tools: [search_symbols, find_callers, trace_path]
+    rubric: >
+      Must describe the service -> hook boundary: a useProjects TanStack Query hook calls the
+      project service, and components read the hook (never the service or fetch directly).
+
+  - id: empty-state
+    question: "How does the reusable EmptyState component work?"
+    surface: gigs_ai
+    expect_citations:
+      files:
+        - src/components/empty-state/empty-state.tsx
+    expect_tools: [search_symbols]
+    rubric: >
+      Must describe a single shared EmptyState component driven by a typed asset/illustration
+      key and carrying at least one call-to-action.
+
+  - id: client-auth-guard
+    question: "How is client-side route auth-gating implemented?"
+    surface: gigs_ai
+    expect_citations:
+      files:
+        - src/components/auth/auth-guard.tsx
+    expect_tools: [search_symbols]
+    rubric: >
+      Must describe an AuthGuard component that redirects unauthenticated users away from
+      protected routes on the client.

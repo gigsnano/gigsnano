@@ -1,0 +1,9 @@
+services:
+  falkordb:
+    image: falkordb/falkordb:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - falkordb-data:/data
+volumes:
+  falkordb-data:

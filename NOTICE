@@ -1,0 +1,28 @@
+GigsNano
+Copyright (C) 2026 GigsNano and contributors
+
+Licensed under the GNU Affero General Public License v3.0 only (see LICENSE).
+The GigsNano name and logo are not licensed under the AGPL (see TRADEMARK.md).
+
+This product includes third-party material under its own license:
+
+1. BMAD-METHOD agent personas and workflow prompts (adapted) — apps/api/bmad_assets/
+   Copyright (c) 2025 BMad Code, LLC. MIT License — full text in
+   apps/api/bmad_assets/LICENSE.
+   https://github.com/bmad-code-org/BMAD-METHOD
+   "BMad", "BMad Method" and "BMAD-METHOD" are trademarks of BMad Code, LLC.
+   GigsNano is not affiliated with or endorsed by BMad Code, LLC; the names are
+   used only to describe compatibility with the method.
+
+2. Bklit UI chart components (vendored) — apps/web/src/components/charts/
+   Copyright (c) 2026 uixmat. MIT License — full text in
+   apps/web/src/components/charts/LICENSE.
+   https://github.com/bklit/bklit-ui
+
+3. Empty-state illustrations (traced from "1,600 Free Illustrations — Vector
+   illustrations set", Figma Community) — apps/web/src/components/empty-state/
+   Source: https://www.figma.com/community (file EsLWGin19gXpenrhPKJ8qz)
+   Used under the Figma Community terms for that file; author credit to be added.
+
+Dependencies installed by the package managers (npm, PyPI) carry their own
+licenses; run `pnpm licenses list` and `pip-licenses` for the full list.

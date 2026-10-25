@@ -1,0 +1,36 @@
+{
+  "name": "@gigsnano/core",
+  "version": "0.1.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vitest": "3.2.6"
+  },
+  "description": "Shared GigsNano types, API client, briefing rules and design tokens (framework-free; for bundlers such as Metro, Vite, webpack).",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gigsnano/gigsnano.git",
+    "directory": "packages/core"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  }
+}

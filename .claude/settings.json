@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PostToolBatch": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/react-doctor.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "uv run --project \"$CLAUDE_PROJECT_DIR/apps/api\" python \"$CLAUDE_PROJECT_DIR/apps/api/scripts/python_doctor.py\" --hook"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "source": {
+    "name": "1,600 Free Illustrations — Vector illustrations set (Community)",
+    "fileKey": "EsLWGin19gXpenrhPKJ8qz",
+    "url": "https://www.figma.com/design/EsLWGin19gXpenrhPKJ8qz/1-600-Free-Illustrations---Vector-illustrations-set--svg-png---Community-",
+    "extractedVia": "Figma MCP download_assets (svg), background rects stripped, fill=black -> currentColor"
+  },
+  "illustrations": [
+    { "key": "project",       "figmaName": "coding-a-website",   "nodeId": "118:2029", "file": "svg/project.svg" },
+    { "key": "sprint",        "figmaName": "lets-start",         "nodeId": "118:2138", "file": "svg/sprint.svg" },
+    { "key": "board",         "figmaName": "analyze-data",       "nodeId": "118:1976", "file": "svg/board.svg" },
+    { "key": "module",        "figmaName": "designer-working",   "nodeId": "118:2046", "file": "svg/module.svg" },
+    { "key": "members",       "figmaName": "about-our-team",     "nodeId": "118:1972", "file": "svg/members.svg" },
+    { "key": "error",         "figmaName": "bug",                "nodeId": "118:2000", "file": "svg/error.svg" },
+    { "key": "error-404",     "figmaName": "bye",                "nodeId": "118:2019", "file": "svg/error-404.svg" },
+    { "key": "search-empty",  "figmaName": "asking-question",    "nodeId": "118:1985", "file": "svg/search-empty.svg" },
+    { "key": "notifications", "figmaName": "newsletter",         "nodeId": "118:2166", "file": "svg/notifications.svg" },
+    { "key": "generic",       "figmaName": "being-creative",     "nodeId": "118:1989", "file": "svg/generic.svg" }
+  ]
+}

@@ -1,0 +1,2178 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   GigsNano landing — STYLE GUIDE
+   The shared design system for every marketing section: the light/dark
+   token contract, the mono/blueprint primitives, the display type, the
+   3D card slab, the keycap + ghost CTAs, and the entrance motion.
+
+   Ownership split:
+   • landing.css (this file) — the reusable vocabulary. Tokens live on
+     `.lp-surface` (mounted on the marketing layout root) so *every*
+     section, not just the hero, resolves `--lp-*`.
+   • hero.css — only the hero illustration (conveyor belt, kanban board,
+     keycap "machine", flow connectors, headline arrow). It consumes the
+     tokens defined here.
+
+   Adding a section? Compose these classes — don't re-derive colors:
+     .lp-frame      dashed 74rem blueprint column (+ .lp-cross markers)
+     .lp-eyebrow    mono section index/label with a leading accent dot
+     .lp-h2         section display heading (.lp-outline / .lp-accent words)
+     .lp-lede       dim supporting paragraph
+     .lp-hr         dashed rule (drop two .lp-cross for + corners)
+     .lp-card       3D slab (hover-lift, --active, --done, __title, __meta)
+     .lp-rise       staggered blurred-rise entrance (set --lp-delay)
+     .lp-key        keycap CTA · .lp-ghost  metallic outline CTA
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Theme contract: light palette (default) ─────────────────────────────
+   Scoped to `.lp-surface` so it cascades to the whole marketing page. */
+.lp-surface {
+  --lp-bg: oklch(0.97 0.003 106.449);
+  --lp-line: oklch(0.179 0.006 285.767 / 0.1);
+  --lp-cross: oklch(0.179 0.006 285.767 / 0.35);
+  --lp-ink: oklch(0.192 0.004 286.018);
+  --lp-ink-dim: oklch(0.48 0.006 286.158);
+  --lp-ink-faint: oklch(0.678 0.009 286.165);
+  --lp-outline: oklch(0.192 0.004 286.018 / 0.32);
+  --lp-accent: oklch(0.603 0.218 257.424);
+  --lp-accent-bright: oklch(0.603 0.218 257.424);
+  --lp-soft-bg: oklch(0.179 0.006 285.767 / 0.04);
+  /* card slab (designownow 3D): surface gradient + top rim + bottom
+     thickness lip + pooled drop shadow */
+  --lp-card-1: oklch(1 0 0);
+  --lp-card-2: oklch(0.955 0.003 106.45);
+  --lp-card-border: oklch(0.179 0.006 285.767 / 0.1);
+  --lp-card-border-hover: oklch(0.179 0.006 285.767 / 0.2);
+  --lp-card-rim: oklch(1 0 0 / 0.95);
+  --lp-card-lip: oklch(0.881 0.005 106.51);
+  --lp-card-drop: oklch(0.179 0.006 285.767 / 0.32);
+  --lp-well-bg: oklch(0.179 0.006 285.767 / 0.05);
+  --lp-well-shadow: inset 0 1px 2px oklch(0.179 0.006 285.767 / 0.14);
+  --lp-glow-1: oklch(0.603 0.218 257.424 / 0.1);
+  --lp-glow-2: oklch(0.709 0.159 293.541 / 0.06);
+  /* conveyor rail + tiles */
+  --lp-rail-1: oklch(0.943 0.003 106.45);
+  --lp-rail-2: oklch(0.9 0.003 106.453);
+  --lp-tread: oklch(0.179 0.006 285.767 / 0.16);
+  --lp-tile-1: oklch(1 0 0);
+  --lp-tile-2: oklch(0.943 0.001 106.425);
+  --lp-tile-border: oklch(0.179 0.006 285.767 / 0.12);
+  --lp-tile-edge: oklch(1 0 0 / 0.9);
+  --lp-tile-shadow: 0 10px 18px -10px oklch(0.179 0.006 285.767 / 0.3);
+  /* keycap tray — light aluminum on light, gunmetal on dark */
+  --lp-tray-1: oklch(0.943 0 0);
+  --lp-tray-2: oklch(0.842 0 0);
+  --lp-tray-edge: oklch(0.735 0 0);
+  --lp-tray-ring: oklch(1 0 0 / 0.9);
+  --lp-tray-shadow: oklch(0.179 0.006 285.767 / 0.4);
+  /* ghost secondary pill */
+  --lp-ghost-border: oklch(0.179 0.006 285.767 / 0.14);
+  --lp-ghost-border-hover: oklch(0.179 0.006 285.767 / 0.28);
+  --lp-ghost-bg-1: oklch(1 0 0 / 0.9);
+  --lp-ghost-bg-2: oklch(1 0 0 / 0.4);
+  --lp-ghost-hover: oklch(0.179 0.006 285.767 / 0.04);
+  --lp-ghost-ring: oklch(1 0 0 / 0.85);
+
+  --lp-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --lp-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Theme contract: dark palette (designownow canvas) ── */
+.dark .lp-surface {
+  --lp-bg: oklch(0.169 0.002 286.177);
+  --lp-line: oklch(1 0 0 / 0.09);
+  --lp-cross: oklch(1 0 0 / 0.38);
+  --lp-ink: oklch(0.97 0.001 106.424);
+  --lp-ink-dim: oklch(0.721 0.003 106.471);
+  --lp-ink-faint: oklch(0.465 0.005 286.212);
+  --lp-outline: oklch(1 0 0 / 0.34);
+  --lp-accent-bright: oklch(0.671 0.177 254.495);
+  --lp-soft-bg: oklch(1 0 0 / 0.035);
+  --lp-card-1: oklch(0.228 0.006 285.935);
+  --lp-card-2: oklch(0.183 0.004 285.994);
+  --lp-card-border: oklch(1 0 0 / 0.1);
+  --lp-card-border-hover: oklch(1 0 0 / 0.2);
+  --lp-card-rim: oklch(1 0 0 / 0.09);
+  --lp-card-lip: oklch(0.123 0.003 285.968);
+  --lp-card-drop: oklch(0 0 0 / 0.75);
+  --lp-well-bg: oklch(0.155 0.004 285.899);
+  --lp-well-shadow: inset 0 1px 3px oklch(0 0 0 / 0.6);
+  --lp-glow-1: oklch(0.603 0.218 257.424 / 0.16);
+  --lp-glow-2: oklch(0.709 0.159 293.541 / 0.07);
+  --lp-rail-1: oklch(0.206 0.006 285.871);
+  --lp-rail-2: oklch(0.155 0.002 286.152);
+  --lp-tread: oklch(1 0 0 / 0.13);
+  --lp-tile-1: oklch(0.257 0.006 286.002);
+  --lp-tile-2: oklch(0.174 0.004 285.967);
+  --lp-tile-border: oklch(1 0 0 / 0.12);
+  --lp-tile-edge: oklch(1 0 0 / 0.14);
+  --lp-tile-shadow: 0 10px 18px -10px oklch(0 0 0 / 0.9);
+  /* subtle gunmetal tray — no bright rim on the black canvas */
+  --lp-tray-1: oklch(0.31 0.005 286.087);
+  --lp-tray-2: oklch(0.214 0.004 286.068);
+  --lp-tray-edge: oklch(0.123 0.003 285.968);
+  --lp-tray-ring: oklch(1 0 0 / 0.16);
+  --lp-tray-shadow: oklch(0 0 0 / 0.85);
+  --lp-ghost-border: oklch(1 0 0 / 0.16);
+  --lp-ghost-border-hover: oklch(1 0 0 / 0.3);
+  --lp-ghost-bg-1: oklch(1 0 0 / 0.09);
+  --lp-ghost-bg-2: oklch(1 0 0 / 0.02);
+  --lp-ghost-hover: oklch(1 0 0 / 0.06);
+  --lp-ghost-ring: oklch(1 0 0 / 0.14);
+}
+
+/* ── Marketing nav bar (designownow header) ──────────────────────────────
+   Content-width bar (same 74rem as .lp-frame), 15px radius — not a full
+   pill — and the reference's layered shadow stack: top hairline highlight,
+   bottom inner glow, pressed-in top shade, long soft drop. Standalone vars
+   (the bar renders in the shared header chrome). */
+
+.lp-nav {
+  --lpnav-bg: oklch(1 0 0 / 0.6);
+  --lpnav-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.9),
+    inset 0 -1px 3px oklch(1 0 0 / 0.6),
+    inset 0 3px 3px oklch(0.179 0.006 285.767 / 0.12),
+    0 18px 16px -8px oklch(0.179 0.006 285.767 / 0.09),
+    0 30px 17px -12px oklch(0.179 0.006 285.767 / 0.03);
+  border-radius: 15px;
+  background: var(--lpnav-bg);
+  box-shadow: var(--lpnav-shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.dark .lp-nav {
+  --lpnav-bg: oklch(0.248 0 0 / 0.5);
+  --lpnav-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.04),
+    inset 0 -1px 3px oklch(1 0 0 / 0.06),
+    inset 0 3px 3px oklch(0 0 0 / 0.4),
+    0 39px 16px oklch(0 0 0 / 0.06),
+    0 61px 17px oklch(0 0 0 / 0.01);
+}
+
+/* ── Blueprint frame: dashed columns + crosshair markers ─────────────────
+   The 74rem "sheet" every section shares, so its dashed edges line up down
+   the whole page. Sections set their own vertical padding via a modifier
+   or a scoped override (e.g. `.lp-hero .lp-frame`). */
+
+.lp-frame {
+  position: relative;
+  max-width: 74rem;
+  margin-inline: auto;
+  padding: 5.5rem 2.5rem;
+  /* dashed vertical edges */
+  background-image:
+    linear-gradient(to bottom, var(--lp-line) 55%, transparent 55%),
+    linear-gradient(to bottom, var(--lp-line) 55%, transparent 55%);
+  background-repeat: repeat-y;
+  background-size:
+    1px 12px,
+    1px 12px;
+  background-position:
+    left top,
+    right top;
+}
+
+.lp-hr {
+  position: relative;
+  height: 1px;
+  background-image: linear-gradient(to right, var(--lp-line) 55%, transparent 55%);
+  background-size: 12px 1px;
+}
+
+/* + crosshair, centered on its anchor point */
+.lp-cross {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  pointer-events: none;
+}
+.lp-cross::before,
+.lp-cross::after {
+  content: "";
+  position: absolute;
+  background: var(--lp-cross);
+}
+.lp-cross::before {
+  left: 6px;
+  top: 0;
+  width: 1px;
+  height: 13px;
+}
+.lp-cross::after {
+  left: 0;
+  top: 6px;
+  width: 13px;
+  height: 1px;
+}
+.lp-cross[data-pos="start"] {
+  left: -6.5px;
+  top: -6.5px;
+}
+.lp-cross[data-pos="end"] {
+  right: -6.5px;
+  top: -6.5px;
+}
+
+/* ── Micro-labels ────────────────────────────────────────────────────── */
+
+.lp-mono {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.lp-note {
+  color: var(--lp-ink-faint);
+}
+
+.lp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.42rem 0.9rem;
+  border: 1px solid var(--lp-line);
+  border-radius: 999px;
+  background: var(--lp-soft-bg);
+  color: var(--lp-ink-dim);
+  backdrop-filter: blur(4px);
+}
+
+.lp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.34rem 0.65rem;
+  border: 1px solid var(--lp-line);
+  border-radius: 0.45rem;
+  background: var(--lp-soft-bg);
+  color: var(--lp-ink-dim);
+}
+.lp-tag::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--lp-accent-bright);
+}
+
+/* colored mini icon chips (designownow's top-left cluster) */
+.lp-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 0.45rem;
+  color: oklch(0.174 0.004 285.967);
+}
+
+/* ── Section heading system ──────────────────────────────────────────────
+   A step down from the hero H1: mono eyebrow → display H2 (solid, with
+   optional outline/accent words) → dim lede. */
+
+.lp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--lp-ink-faint);
+}
+.lp-eyebrow::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--lp-accent-bright);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lp-accent-bright) 18%, transparent);
+}
+
+.lp-h2 {
+  margin-top: 1.15rem;
+  font-family: var(--font-heading, var(--font-display), sans-serif);
+  font-size: clamp(1.95rem, 4.2vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.022em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: var(--lp-ink);
+}
+
+.lp-lede {
+  margin-top: 1.15rem;
+  max-width: 34rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--lp-ink-dim);
+}
+
+/* ── Display type (shared with the hero H1) ─────────────────────────────── */
+
+.lp-display {
+  font-family: var(--font-heading, var(--font-display), sans-serif);
+  font-size: clamp(2.7rem, 7.2vw, 5.6rem);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.lp-outline,
+.lp-display-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--lp-outline);
+}
+
+.lp-accent,
+.lp-display-accent {
+  color: var(--lp-accent-bright);
+}
+
+/* ── 3D card slab ───────────────────────────────────────────────────────
+   Surface gradient + top rim highlight + bottom thickness lip + pooled
+   drop. Used by the hero board and every section that needs a raised
+   panel. */
+
+.lp-card {
+  position: relative;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--lp-card-border);
+  border-radius: 0.85rem;
+  background: linear-gradient(180deg, var(--lp-card-1) 0%, var(--lp-card-2) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 2px 0 0 var(--lp-card-lip),
+    0 16px 26px -16px var(--lp-card-drop);
+  transition:
+    transform 160ms var(--lp-ease-out),
+    box-shadow 160ms var(--lp-ease-out),
+    border-color 200ms ease;
+}
+.lp-card + .lp-card {
+  margin-top: 0.8rem;
+}
+@media (hover: hover) and (pointer: fine) {
+  .lp-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--lp-card-border-hover);
+    box-shadow:
+      inset 0 1px 0 var(--lp-card-rim),
+      0 4px 0 0 var(--lp-card-lip),
+      0 22px 32px -16px var(--lp-card-drop);
+  }
+}
+
+.lp-card--active {
+  border-color: oklch(0.603 0.218 257.424 / 0.35);
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 2px 0 0 var(--lp-card-lip),
+    0 0 0 1px oklch(0.603 0.218 257.424 / 0.12),
+    0 16px 30px -14px oklch(0.603 0.218 257.424 / 0.28);
+}
+.lp-card--done {
+  opacity: 0.72;
+}
+
+.lp-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+  color: var(--lp-ink-faint);
+}
+/* inset well, like the reference's recessed chip slots */
+.lp-card__bot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--lp-line);
+  background: var(--lp-well-bg);
+  box-shadow: var(--lp-well-shadow);
+  color: var(--lp-ink-dim);
+}
+.lp-card__title {
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--lp-ink);
+}
+.lp-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+/* ── Feature pillars (section-specific slab variant) ─────────────────────
+   A taller .lp-card: colored icon tile, mono index, title, body, and a
+   spec footer that nudges on hover. Accent per-card via --lp-local. */
+
+.lp-pillar {
+  --lp-local: var(--lp-accent-bright);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.5rem 1.4rem 1.35rem;
+  overflow: hidden;
+}
+/* Hover is a restrained, near-neutral lift — the neutral border + shadow come
+   from `.lp-card:hover`. No accent-tinted border, no colored glow wash: the
+   card's color identity lives only in the tile and the illustration. */
+
+.lp-pillar__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.lp-pillar__index {
+  color: var(--lp-ink-faint);
+}
+
+/* colored icon tile — mini .lp-tile in the pillar's accent */
+.lp-pillar__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.85rem;
+  height: 2.85rem;
+  margin-top: 1.4rem;
+  border-radius: 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--lp-local) 30%, var(--lp-tile-border));
+  background:
+    radial-gradient(120% 90% at 50% -20%, color-mix(in srgb, var(--lp-local) 26%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--lp-tile-1) 0%, var(--lp-tile-2) 100%);
+  box-shadow:
+    var(--lp-tile-shadow),
+    inset 0 1px 0 var(--lp-tile-edge);
+  color: var(--lp-local);
+  transition:
+    transform 220ms var(--lp-ease-out),
+    box-shadow 220ms var(--lp-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .lp-pillar:hover .lp-pillar__icon {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow:
+      0 14px 22px -10px color-mix(in srgb, var(--lp-local) 55%, transparent),
+      inset 0 1px 0 var(--lp-tile-edge);
+  }
+}
+
+.lp-pillar__title {
+  margin-top: 1.25rem;
+  font-family: var(--font-heading, var(--font-display), sans-serif);
+  font-size: 1.18rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--lp-ink);
+}
+.lp-pillar__body {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--lp-ink-dim);
+}
+
+/* spec footer: dashed rule + mono line whose arrow nudges on hover */
+.lp-pillar__spec {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 1.1rem;
+  color: var(--lp-local);
+}
+.lp-pillar__spec::before {
+  content: "";
+  align-self: stretch;
+  position: absolute;
+  left: 1.4rem;
+  right: 1.4rem;
+  margin-top: -1.1rem;
+  height: 1px;
+  background-image: linear-gradient(to right, var(--lp-line) 55%, transparent 55%);
+  background-size: 10px 1px;
+}
+.lp-pillar__arrow {
+  transition: transform 240ms var(--lp-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .lp-pillar:hover .lp-pillar__arrow {
+    transform: translateX(4px);
+  }
+}
+
+/* ── Illustrated pillar (designownow bento) ──────────────────────────────
+   Title + body sit in the top band; a code-built 3D scene fills the bottom,
+   bleeds to the card edges, and melts up into the body via a mask. The
+   scene reuses the slab tokens, so it adapts to light/dark like the hero. */
+
+.lp-pillar--scene {
+  min-height: 20.5rem;
+  padding-bottom: 0;
+}
+.lp-pillar--scene .lp-pillar__title {
+  margin-top: 0.35rem;
+}
+
+/* small blueprint index tag, pinned to the card corner */
+.lp-pillar__tag {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.4rem;
+  z-index: 3;
+  color: var(--lp-ink-faint);
+}
+
+/* the illustration stage: bottom band, edge-to-edge, top fades into body */
+.lp-pillar__illus {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 11.75rem;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, oklch(0 0 0) 20%);
+  mask-image: linear-gradient(to bottom, transparent, oklch(0 0 0) 20%);
+}
+/* faint blueprint grid pooled toward the bottom */
+.lp-pillar__illus::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--lp-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--lp-line) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(120% 95% at 50% 125%, oklch(0 0 0), transparent 68%);
+  mask-image: radial-gradient(120% 95% at 50% 125%, oklch(0 0 0), transparent 68%);
+  opacity: 0.65;
+}
+
+/* stacked planning-card mini slabs (the Sprint-0 board seed) */
+.lp-mini {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 8.9rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.65rem;
+  border: 1px solid var(--lp-card-border);
+  background: linear-gradient(180deg, var(--lp-card-1) 0%, var(--lp-card-2) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 14px 24px -12px var(--lp-card-drop);
+  transition: transform 340ms var(--lp-ease-out);
+}
+.lp-mini__id {
+  color: var(--lp-ink-faint);
+}
+.lp-mini__title {
+  margin-top: 0.32rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--lp-ink);
+}
+.lp-mini__row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+.lp-mini__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+}
+.lp-mini__chip {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  padding: 0.06rem 0.32rem;
+  border-radius: 0.32rem;
+  border: 1px solid var(--lp-line);
+  background: var(--lp-well-bg);
+  box-shadow: var(--lp-well-shadow);
+  color: var(--lp-ink-dim);
+  font-size: 0.56rem;
+}
+/* agent byline inside the front mockup card (decorative scene text) */
+.lp-mini__agent {
+  font-size: 0.56rem;
+  font-weight: 500;
+  color: var(--lp-local);
+}
+
+/* depth placement: back (dim, tilted, cropped) → mid → front (sharp) */
+.lp-mini--back {
+  right: -2.3rem;
+  bottom: 6.5rem;
+  transform: rotate(7deg) scale(0.86);
+  opacity: 0.42;
+}
+.lp-mini--mid {
+  right: 0.7rem;
+  bottom: 3.9rem;
+  transform: rotate(3.5deg) scale(0.94);
+  opacity: 0.78;
+}
+.lp-mini--front {
+  left: 1.1rem;
+  bottom: 1.25rem;
+  z-index: 2;
+}
+
+/* hover: the stack lifts with a touch of parallax */
+@media (hover: hover) and (pointer: fine) {
+  .lp-pillar--scene:hover .lp-mini--front {
+    transform: translateY(-5px);
+  }
+  .lp-pillar--scene:hover .lp-mini--mid {
+    transform: rotate(3.5deg) scale(0.94) translateY(-3px);
+  }
+  .lp-pillar--scene:hover .lp-mini--back {
+    transform: rotate(7deg) scale(0.86) translateY(-2px);
+  }
+}
+
+/* shared: a muted "text line" bar used inside doc/chat mockups */
+.lp-bar {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--lp-well-bg);
+  box-shadow: var(--lp-well-shadow);
+}
+
+/* ═══ Card 02 scene — an AI agent chip streaming a reply ═══════════════ */
+
+/* the agent "app-icon" chip: aluminum tray → dark dot-matrix screen with a
+   glowing brain glyph + an online pip */
+.lp-agent {
+  position: absolute;
+  left: 1.15rem;
+  bottom: 1.5rem;
+  width: 4.6rem;
+  height: 4.6rem;
+  padding: 5px;
+  border-radius: 1.3rem;
+  background: linear-gradient(180deg, var(--lp-tray-1) 0%, var(--lp-tray-2) 100%);
+  box-shadow:
+    0 2px 0 0 var(--lp-tray-edge),
+    0 18px 28px -14px var(--lp-tray-shadow),
+    inset 0 1px 0 var(--lp-tray-ring);
+  transition: transform 340ms var(--lp-ease-out);
+}
+.lp-agent__screen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 1rem;
+  background-color: oklch(0.123 0.003 285.968);
+  background-image: radial-gradient(circle, oklch(1 0 0 / 0.14) 1px, transparent 1.3px);
+  background-size: 6px 6px;
+  background-position: center;
+  box-shadow:
+    inset 0 0 0 1px oklch(1 0 0 / 0.06),
+    inset 0 2px 6px oklch(0 0 0 / 0.9);
+  overflow: hidden;
+}
+/* accent light pooled behind the glyph */
+.lp-agent__screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(65% 55% at 50% 42%, color-mix(in srgb, var(--lp-local) 55%, transparent), transparent 72%);
+}
+.lp-agent__glyph {
+  position: relative;
+  color: var(--lp-local);
+  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--lp-local) 80%, transparent));
+}
+/* online pip */
+.lp-agent__pip {
+  position: absolute;
+  right: -2px;
+  top: -2px;
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  background: oklch(0.762 0.154 159.355);
+  border: 2px solid var(--lp-card-2);
+  box-shadow: 0 0 8px 1px oklch(0.762 0.154 159.355 / 0.7);
+}
+
+/* chat bubbles floating up-right from the agent */
+.lp-bubble {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.34rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--lp-card-border);
+  background: linear-gradient(180deg, var(--lp-card-1) 0%, var(--lp-card-2) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 12px 22px -12px var(--lp-card-drop);
+  transition: transform 340ms var(--lp-ease-out);
+}
+.lp-bubble__name {
+  color: var(--lp-local);
+}
+/* back bubble: an earlier message (text lines), faded + tilted */
+.lp-bubble--msg {
+  right: 0.5rem;
+  top: 0.3rem;
+  width: 7.4rem;
+  border-radius: 0.7rem 0.7rem 0.2rem 0.7rem;
+  opacity: 0.62;
+  transform: rotate(-2deg);
+}
+/* front bubble: the live reply with streaming dots */
+.lp-bubble--reply {
+  right: 1.5rem;
+  top: 3.35rem;
+  width: 6.1rem;
+  z-index: 2;
+  border-radius: 0.7rem 0.7rem 0.2rem 0.7rem;
+}
+.lp-bubble__dots {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  height: 0.55rem;
+}
+.lp-bubble__dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--lp-local);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-pillar--scene:hover .lp-agent {
+    transform: translateY(-3px);
+  }
+  .lp-pillar--scene:hover .lp-bubble--reply {
+    transform: translateY(-4px);
+  }
+  .lp-pillar--scene:hover .lp-bubble--msg {
+    transform: rotate(-2deg) translateY(-6px);
+  }
+}
+
+/* ═══ Card 03 scene — a generated doc with a reviewed block ════════════ */
+
+.lp-doc {
+  position: absolute;
+  left: 1.15rem;
+  bottom: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 10.75rem;
+  padding: 0.7rem 0.75rem 0.8rem;
+  border-radius: 0.72rem;
+  border: 1px solid var(--lp-card-border);
+  background: linear-gradient(180deg, var(--lp-card-1) 0%, var(--lp-card-2) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 14px 24px -12px var(--lp-card-drop);
+  transition: transform 340ms var(--lp-ease-out);
+}
+.lp-doc__head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  margin-bottom: 0.6rem;
+}
+.lp-doc__head b {
+  width: 3.4rem;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--lp-ink);
+  opacity: 0.62;
+}
+.lp-doc__head i {
+  width: 6px;
+  height: 6px;
+  margin-left: auto;
+  border-radius: 999px;
+  background: var(--lp-local);
+}
+.lp-doc__line {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--lp-well-bg);
+  box-shadow: var(--lp-well-shadow);
+}
+.lp-doc__line + .lp-doc__line {
+  margin-top: 0.42rem;
+}
+/* the selected / highlighted block */
+.lp-doc__line--hl {
+  height: 0.95rem;
+  margin-block: 0.5rem;
+  border-radius: 0.28rem;
+  background: color-mix(in srgb, var(--lp-local) 26%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lp-local) 55%, transparent);
+}
+
+/* comment bubble anchored to the highlight, overlapping the doc's right edge */
+.lp-comment {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 3.6rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.4rem 0.55rem 0.4rem 0.4rem;
+  border-radius: 0.62rem 0.62rem 0.62rem 0.2rem;
+  border: 1px solid var(--lp-card-border);
+  background: linear-gradient(180deg, var(--lp-card-1) 0%, var(--lp-card-2) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 14px 22px -12px var(--lp-card-drop);
+  transition: transform 340ms var(--lp-ease-out);
+}
+.lp-comment__avatar {
+  display: grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lp-local) 85%, white), var(--lp-local));
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.4);
+  color: oklch(0.168 0.022 162.071);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.lp-comment__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+.lp-comment__name {
+  color: var(--lp-local);
+}
+/* little connector tick from the highlight to the comment */
+.lp-comment::before {
+  content: "";
+  position: absolute;
+  left: -0.55rem;
+  top: 50%;
+  width: 0.55rem;
+  height: 1px;
+  background: color-mix(in srgb, var(--lp-local) 60%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-pillar--scene:hover .lp-doc {
+    transform: translateY(-3px);
+  }
+  .lp-pillar--scene:hover .lp-comment {
+    transform: translateY(-5px);
+  }
+}
+
+/* ── Agent roster (section 02) ───────────────────────────────────────────
+   Seven agent spec-modules: a colored agent tile + role + the BMAD artifact
+   each owns. Uniform card width with the last row centered (flex-wrap), each
+   accent-lit on hover. Accent per card via --lp-local. */
+
+.lp-roster {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+.lp-roster > * {
+  flex: 0 1 14.5rem;
+}
+
+.lp-agentcard {
+  --lp-local: var(--lp-accent-bright);
+  width: 100%;
+  height: 100%;
+  padding: 1.15rem 1.2rem 1.3rem;
+  overflow: hidden;
+}
+.lp-agentcard__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.lp-agentcard__tile {
+  display: grid;
+  place-items: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--lp-local) 32%, var(--lp-tile-border));
+  background:
+    radial-gradient(120% 90% at 50% -20%, color-mix(in srgb, var(--lp-local) 40%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--lp-tile-1) 0%, var(--lp-tile-2) 100%);
+  box-shadow:
+    var(--lp-tile-shadow),
+    inset 0 1px 0 var(--lp-tile-edge);
+  color: var(--lp-local);
+  letter-spacing: 0.08em;
+  transition:
+    transform 220ms var(--lp-ease-out),
+    box-shadow 220ms var(--lp-ease-out);
+}
+.lp-agentcard__idx {
+  color: var(--lp-ink-faint);
+}
+.lp-agentcard__role {
+  margin-top: 0.9rem;
+  font-family: var(--font-heading, var(--font-display), sans-serif);
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--lp-ink);
+}
+.lp-agentcard__owns {
+  margin-top: 0.35rem;
+  color: var(--lp-ink-faint);
+}
+.lp-agentcard__owns b {
+  font-weight: 500;
+  color: var(--lp-local);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  /* neutral lift (border + shadow) inherited from `.lp-card:hover`; only the
+     tile gets a restrained accent tint so identity stays without a glow blob */
+  .lp-agentcard:hover .lp-agentcard__tile {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow:
+      0 5px 12px -7px color-mix(in srgb, var(--lp-local) 35%, transparent),
+      inset 0 1px 0 var(--lp-tile-edge);
+  }
+}
+
+/* ── Stat band (section 03) ──────────────────────────────────────────────
+   designownow-style stat cards: a dark dot-matrix "pixel" tile whose LEDs
+   ripple in a diagonal wave, an accent bar, a count-up number, and a mono
+   label — plus the reference's short accent hairline on the top edge. Accent
+   per card via --lp-local. */
+
+/* a slimmer sheet for the stat row */
+.lp-frame--tight {
+  padding-block: 3.5rem;
+}
+
+.lp-statcard {
+  --lp-local: var(--lp-accent-bright);
+  padding: 1.4rem 1.4rem 1.35rem;
+  overflow: hidden;
+}
+/* short accent hairline bleeding off the top edge (designownow) */
+.lp-statcard::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 1.4rem;
+  width: 3.2rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--lp-local), transparent);
+  opacity: 0.55;
+  transition: width 320ms var(--lp-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  /* only the hairline reacts; border + lift stay neutral (`.lp-card:hover`) */
+  .lp-statcard:hover::before {
+    width: 5rem;
+  }
+}
+
+.lp-statcard__head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+.lp-statcard__bar {
+  width: 3px;
+  height: 2.1rem;
+  border-radius: 999px;
+  background: var(--lp-local);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--lp-local) 60%, transparent);
+}
+.lp-statcard__num {
+  font-family: var(--font-heading, var(--font-display), sans-serif);
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--lp-ink);
+}
+.lp-statcard__label {
+  margin-top: 1.05rem;
+  color: var(--lp-ink-dim);
+}
+
+/* the dot-matrix pixel tile: a 5×5 LED grid. Each card lights a content-
+   specific glyph (its `.on` cells) in a diagonal wave; the rest of the grid
+   stays a faint backdrop so the screen still reads as a matrix. */
+.lp-pix {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  place-items: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  padding: 0.44rem;
+  border-radius: 0.72rem;
+  background-color: oklch(0.146 0.004 285.857);
+  box-shadow:
+    inset 0 0 0 1px oklch(1 0 0 / 0.06),
+    inset 0 2px 6px oklch(0 0 0 / 0.85);
+  overflow: hidden;
+}
+/* ambient accent glow behind the LEDs */
+.lp-pix::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 55% at 50% 45%, color-mix(in srgb, var(--lp-local) 30%, transparent), transparent 75%);
+}
+.lp-pix span {
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--lp-local);
+  opacity: 0.09;
+}
+/* lit glyph cells: pulse bright in a diagonal wave (delay set inline) */
+.lp-pix span.on {
+  box-shadow: 0 0 5px color-mix(in srgb, var(--lp-local) 90%, transparent);
+  animation: lp-pix-on 2.6s var(--lp-ease-out) infinite;
+  animation-delay: var(--lp-d, 0ms);
+}
+@keyframes lp-pix-on {
+  0%,
+  68%,
+  100% {
+    opacity: 0.28;
+    transform: scale(0.82);
+  }
+  34% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-pix span {
+    animation: none;
+  }
+  .lp-pix span.on {
+    opacity: 0.95;
+  }
+}
+
+/* ── Step timeline (section 03) ──────────────────────────────────────────
+   Four neutral numbered nodes on a dashed connector rail, with a single
+   accent "flow" comet sweeping left→right to show the ordered progression.
+   Restrained: the nodes stay neutral; the only color is the moving comet. */
+
+.lp-steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem 1.5rem;
+}
+@media (min-width: 640px) {
+  .lp-steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .lp-steps {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* the connector rail across the node centers (desktop only) */
+.lp-steps__rail {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .lp-steps__rail {
+    display: block;
+    position: absolute;
+    top: 1.5rem;
+    left: 11%;
+    right: 11%;
+    height: 1px;
+    background-image: linear-gradient(to right, var(--lp-line) 55%, transparent 55%);
+    background-size: 10px 1px;
+    overflow: hidden;
+  }
+  /* the accent comet sweeping along the rail */
+  .lp-steps__rail::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 16%;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, var(--lp-accent-bright), transparent);
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--lp-accent-bright) 55%, transparent));
+    animation: lp-steps-flow 3.6s linear infinite;
+  }
+}
+@keyframes lp-steps-flow {
+  0% {
+    transform: translate(-100%, -50%);
+    opacity: 0;
+  }
+  12%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(625%, -50%);
+    opacity: 0;
+  }
+}
+
+.lp-step {
+  position: relative;
+}
+.lp-step__node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--lp-card-border);
+  background: linear-gradient(180deg, var(--lp-card-1) 0%, var(--lp-card-2) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 2px 0 0 var(--lp-card-lip),
+    0 12px 22px -14px var(--lp-card-drop);
+  color: var(--lp-ink);
+  transition:
+    transform 200ms var(--lp-ease-out),
+    box-shadow 200ms var(--lp-ease-out);
+}
+/* a small accent pip marks the node as a live checkpoint */
+.lp-step__node::after {
+  content: "";
+  position: absolute;
+  top: 0.42rem;
+  right: 0.42rem;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--lp-accent-bright);
+  opacity: 0.55;
+}
+.lp-step__label {
+  margin-top: 1.15rem;
+  color: var(--lp-ink-faint);
+}
+.lp-step__title {
+  margin-top: 0.55rem;
+  font-family: var(--font-heading, var(--font-display), sans-serif);
+  font-size: 1.08rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--lp-ink);
+}
+.lp-step__body {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--lp-ink-dim);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-step:hover .lp-step__node {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 var(--lp-card-rim),
+      0 4px 0 0 var(--lp-card-lip),
+      0 16px 26px -14px var(--lp-card-drop);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-steps__rail::before {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+/* ── Product showcases (section 04) ──────────────────────────────────────
+   Alternating text + a themed "app window" that recreates a real GigsNano
+   surface minimally with the landing tokens. */
+
+.lp-showcase {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 3rem;
+}
+@media (min-width: 1024px) {
+  .lp-showcase {
+    grid-template-columns: 1fr 1fr;
+    gap: 4.5rem;
+  }
+}
+.lp-showcase + .lp-showcase {
+  margin-top: 5.5rem;
+}
+/* flipped row: window on the left (desktop only) */
+@media (min-width: 1024px) {
+  .lp-showcase--flip .lp-showcase__text {
+    order: 2;
+  }
+}
+
+.lp-showcase__title {
+  margin-top: 1rem;
+  font-family: var(--font-heading, var(--font-display), sans-serif);
+  font-size: clamp(1.6rem, 3vw, 2.15rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--lp-ink);
+}
+.lp-showcase__body {
+  margin-top: 1rem;
+  max-width: 30rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--lp-ink-dim);
+}
+.lp-showcase__bullets {
+  margin-top: 1.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.lp-showcase__bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--lp-ink-dim);
+}
+.lp-showcase__check {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.05rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--lp-accent-bright) 40%, var(--lp-line));
+  background: color-mix(in srgb, var(--lp-accent-bright) 12%, transparent);
+  color: var(--lp-accent-bright);
+}
+
+/* ── Themed app window (mockup frame) ─────────────────────────────────── */
+
+.lp-window {
+  position: relative;
+  border-radius: 1.1rem;
+  border: 1px solid var(--lp-card-border);
+  background: linear-gradient(180deg, var(--lp-card-1) 0%, var(--lp-card-2) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 2px 0 0 var(--lp-card-lip),
+    0 34px 54px -26px var(--lp-card-drop);
+  overflow: hidden;
+}
+.lp-window__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--lp-line);
+  background: var(--lp-soft-bg);
+}
+.lp-window__dots {
+  display: flex;
+  gap: 0.3rem;
+}
+.lp-window__dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--lp-ink-faint);
+  opacity: 0.4;
+}
+.lp-window__title {
+  color: var(--lp-ink-faint);
+}
+.lp-window__body {
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+/* ── Mock atoms (recreated app UI, landing-token themed) ─────────────────
+   Shared primitives used inside the showcase windows. `--lp-local` sets the
+   per-mock accent (agent color / brand). */
+
+.lp-mk-line {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--lp-well-bg);
+}
+.lp-mk-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--lp-local) 35%, var(--lp-tile-border));
+  background:
+    radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--lp-local) 45%, transparent), transparent 62%),
+    linear-gradient(180deg, var(--lp-tile-1), var(--lp-tile-2));
+  color: var(--lp-local);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.lp-mk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.14rem 0.46rem;
+  border-radius: 0.38rem;
+  border: 1px solid var(--lp-line);
+  background: var(--lp-soft-bg);
+  color: var(--lp-ink-dim);
+  font-size: 0.68rem;
+}
+
+/* chat bubbles */
+.lp-mk-msg {
+  max-width: 86%;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  border-radius: 0.8rem;
+}
+.lp-mk-msg--agent {
+  border: 1px solid var(--lp-card-border);
+  background: var(--lp-soft-bg);
+  color: var(--lp-ink-dim);
+  border-bottom-left-radius: 0.25rem;
+}
+.lp-mk-msg--user {
+  margin-left: auto;
+  background: var(--lp-accent-bright);
+  color: oklch(1 0 0 / 0.96);
+  border-bottom-right-radius: 0.25rem;
+}
+.lp-mk-doc {
+  border: 1px solid var(--lp-card-border);
+  border-radius: 0.6rem;
+  background: var(--lp-card-1);
+  padding: 0.6rem 0.65rem;
+}
+.lp-mk-compose {
+  border: 1px solid var(--lp-card-border);
+  border-radius: 0.7rem;
+  background: var(--lp-card-1);
+  padding: 0.5rem 0.55rem 0.5rem 0.65rem;
+}
+
+/* work-items segmented view switcher (interactive: sliding pill).
+   Buttons are a fixed 1.7rem with a 0.12rem gap, so the pill can slide by a
+   constant step per index — no JS measurement, no first-paint jump. */
+.lp-mk-seg {
+  position: relative;
+  display: inline-flex;
+  gap: 0.12rem;
+  padding: 0.2rem;
+  border-radius: 0.55rem;
+  border: 1px solid var(--lp-line);
+  background: var(--lp-soft-bg);
+}
+.lp-mk-seg__pill {
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 0.4rem;
+  background: var(--lp-card-1);
+  box-shadow:
+    0 1px 2px var(--lp-card-drop),
+    inset 0 1px 0 var(--lp-card-rim);
+  transform: translateX(calc(var(--i, 0) * 1.82rem));
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.lp-mk-segbtn {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 0.4rem;
+  color: var(--lp-ink-faint);
+  cursor: pointer;
+  transition: color 0.3s var(--lp-ease-out);
+}
+.lp-mk-segbtn--on {
+  color: var(--lp-ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-mk-seg__pill {
+    transition: none;
+  }
+}
+
+/* cross-faded view panes (List ↔ Board ↔ Calendar ↔ Spreadsheet ↔ Gantt) */
+.lp-mkview {
+  position: relative;
+  min-height: 15.5rem;
+}
+.lp-mkview__pane {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(6px);
+  filter: blur(4px);
+  pointer-events: none;
+  transition:
+    opacity 0.32s var(--lp-ease-out),
+    transform 0.32s var(--lp-ease-out),
+    filter 0.32s var(--lp-ease-out);
+}
+.lp-mkview__pane[data-active="true"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-mkview__pane {
+    transition: opacity 0.2s linear;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Board (kanban) pane */
+.lp-mk-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+.lp-mk-bcol__hd {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--lp-ink-dim);
+}
+.lp-mk-bcard {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.55rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--lp-card-border);
+  background: linear-gradient(180deg, var(--lp-card-1) 0%, var(--lp-card-2) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 6px 12px -9px var(--lp-card-drop);
+}
+
+/* Calendar pane */
+.lp-mk-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.lp-mk-cal__cell {
+  min-height: 2.3rem;
+  padding: 0.2rem 0.25rem;
+  border-radius: 0.32rem;
+  border: 1px solid var(--lp-line);
+  background: var(--lp-soft-bg);
+  color: var(--lp-ink-faint);
+}
+.lp-mk-cal__ev {
+  margin-top: 0.15rem;
+  height: 0.55rem;
+  border-radius: 0.2rem;
+  background: color-mix(in srgb, var(--lp-local, var(--lp-accent-bright)) 55%, transparent);
+}
+
+/* Spreadsheet pane */
+.lp-mk-trow {
+  display: grid;
+  grid-template-columns: 1.7fr 0.9fr 0.7fr 0.6fr 0.7fr;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.42rem 0.1rem;
+  border-top: 1px solid var(--lp-line);
+}
+.lp-mk-trow--head {
+  border-top: 0;
+  color: var(--lp-ink-faint);
+}
+
+/* Gantt pane */
+.lp-mk-grow {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.34rem 0;
+}
+.lp-mk-gtrack {
+  position: relative;
+  height: 0.62rem;
+  border-radius: 999px;
+  background: var(--lp-well-bg);
+  box-shadow: var(--lp-well-shadow);
+}
+.lp-mk-gbar {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--lp-local, var(--lp-accent-bright)) 90%, transparent), var(--lp-local, var(--lp-accent-bright)));
+}
+
+/* work-items list rows */
+.lp-mk-issue {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.1rem;
+  border-top: 1px solid var(--lp-line);
+}
+.lp-mk-status {
+  flex: none;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--lp-ink-faint);
+}
+.lp-mk-status--done {
+  border-color: transparent;
+  background: oklch(0.762 0.154 159.355);
+}
+.lp-mk-status--active {
+  border-color: var(--lp-accent-bright);
+  background: conic-gradient(var(--lp-accent-bright) 60%, transparent 0);
+}
+
+/* marketplace skill tags */
+.lp-mk-tag {
+  display: inline-flex;
+  padding: 0.16rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--lp-line);
+  background: var(--lp-soft-bg);
+  color: var(--lp-ink-dim);
+  font-size: 0.68rem;
+}
+
+/* ── Ecosystem bus (section 05) ──────────────────────────────────────────
+   Two counter-scrolling rows of connector-chips flanking an animated signal
+   bus — "everything plugs into one line". Pauses on hover. */
+
+.lp-eco__stage {
+  position: relative;
+  margin-top: 3.5rem;
+  padding-block: 0.5rem;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
+}
+
+/* the shared signal bus between the two rows */
+.lp-eco__bus {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 1px;
+  background-image: linear-gradient(to right, var(--lp-accent-bright) 45%, transparent 45%);
+  background-size: 9px 1px;
+  opacity: 0.45;
+  animation: lp-eco-bus 1.3s linear infinite;
+}
+@keyframes lp-eco-bus {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 9px;
+  }
+}
+
+.lp-eco__row {
+  display: flex;
+  width: max-content;
+}
+.lp-eco__row--a {
+  animation: lp-eco-left 42s linear infinite;
+}
+.lp-eco__row--b {
+  margin-top: 1rem;
+  animation: lp-eco-right 52s linear infinite;
+}
+@keyframes lp-eco-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes lp-eco-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+/* seamless -50%→0 loop needs two identical sequences */
+.lp-eco__seq {
+  display: flex;
+  gap: 0.85rem;
+  padding-right: 0.85rem;
+}
+/* pause the belt while the user inspects it */
+.lp-eco__stage:hover .lp-eco__row {
+  animation-play-state: paused;
+}
+
+.lp-eco__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--lp-card-border);
+  background: linear-gradient(180deg, var(--lp-card-1) 0%, var(--lp-card-2) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 8px 16px -12px var(--lp-card-drop);
+  color: var(--lp-ink-dim);
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    transform 200ms var(--lp-ease-out),
+    color 200ms ease,
+    border-color 200ms ease;
+}
+.lp-eco__port {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--lp-local, var(--lp-accent-bright));
+  box-shadow: 0 0 7px color-mix(in srgb, var(--lp-local, var(--lp-accent-bright)) 75%, transparent);
+}
+@media (hover: hover) and (pointer: fine) {
+  .lp-eco__chip:hover {
+    transform: translateY(-2px);
+    color: var(--lp-ink);
+    border-color: var(--lp-card-border-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-eco__row--a,
+  .lp-eco__row--b,
+  .lp-eco__bus {
+    animation: none;
+  }
+  /* show a static, centered sample instead of an off-screen belt */
+  .lp-eco__row {
+    transform: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+  .lp-eco__row--b {
+    display: none;
+  }
+}
+
+/* ── Feature grid (section 06) ───────────────────────────────────────────
+   A calm 3-up grid of fundamentals — neutral tile icon, title, body. The
+   icon warms to the accent on hover; borders stay neutral (maturity pass). */
+
+.lp-featgrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 640px) {
+  .lp-featgrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .lp-featgrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.lp-feat {
+  display: flex;
+  gap: 0.9rem;
+  height: 100%;
+  padding: 1.25rem 1.3rem;
+}
+.lp-feat__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.65rem;
+  border: 1px solid var(--lp-tile-border);
+  background: linear-gradient(180deg, var(--lp-tile-1) 0%, var(--lp-tile-2) 100%);
+  box-shadow:
+    var(--lp-tile-shadow),
+    inset 0 1px 0 var(--lp-tile-edge);
+  color: var(--lp-ink-dim);
+  transition:
+    color 0.2s ease,
+    box-shadow 0.2s var(--lp-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .lp-feat:hover .lp-feat__icon {
+    color: var(--lp-accent-bright);
+    box-shadow:
+      0 6px 14px -8px color-mix(in srgb, var(--lp-accent-bright) 40%, transparent),
+      inset 0 1px 0 var(--lp-tile-edge);
+  }
+}
+.lp-feat__title {
+  font-family: var(--font-heading, var(--font-display), sans-serif);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--lp-ink);
+}
+.lp-feat__body {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--lp-ink-dim);
+}
+
+/* ── Pricing (section 07) ────────────────────────────────────────────────
+   A themed billing toggle (sliding pill) + three tier slabs; the popular tier
+   carries a restrained accent ring and a filled CTA. */
+
+.lp-toggle {
+  position: relative;
+  display: inline-flex;
+  padding: 0.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--lp-line);
+  background: var(--lp-soft-bg);
+}
+.lp-toggle__pill {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  width: 6.4rem;
+  height: calc(100% - 0.5rem);
+  border-radius: 999px;
+  background: var(--lp-card-1);
+  box-shadow:
+    0 1px 2px var(--lp-card-drop),
+    inset 0 1px 0 var(--lp-card-rim);
+  transform: translateX(calc(var(--i, 0) * 6.4rem));
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.lp-toggle__btn {
+  position: relative;
+  z-index: 1;
+  width: 6.4rem;
+  padding: 0.42rem 0;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--lp-ink-faint);
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+.lp-toggle__btn--on {
+  color: var(--lp-ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-toggle__pill {
+    transition: none;
+  }
+}
+
+.lp-price {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.6rem 1.5rem;
+  overflow: hidden;
+}
+.lp-price--top {
+  border-color: color-mix(in srgb, var(--lp-accent-bright) 45%, var(--lp-card-border));
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 0 0 1px color-mix(in srgb, var(--lp-accent-bright) 22%, transparent),
+    0 24px 44px -22px color-mix(in srgb, var(--lp-accent-bright) 35%, transparent);
+}
+/* faint accent bloom behind the popular tier's header */
+.lp-price--top::before {
+  content: "";
+  position: absolute;
+  top: -3rem;
+  left: 50%;
+  width: 12rem;
+  height: 6rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--lp-accent-bright) 30%, transparent), transparent 70%);
+  pointer-events: none;
+}
+.lp-price__head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.lp-price__name {
+  font-family: var(--font-heading, var(--font-display), sans-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--lp-ink);
+}
+.lp-price__badge {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--lp-accent-bright);
+  color: oklch(1 0 0 / 0.96);
+}
+.lp-price__tag {
+  position: relative;
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--lp-ink-dim);
+}
+.lp-price__amount {
+  position: relative;
+  margin-top: 1.3rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+.lp-price__num {
+  font-family: var(--font-heading, var(--font-display), sans-serif);
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--lp-ink);
+}
+.lp-price__per {
+  font-size: 0.82rem;
+  color: var(--lp-ink-faint);
+}
+.lp-price__cta {
+  position: relative;
+  margin-top: 1.3rem;
+  display: block;
+  width: 100%;
+  padding: 0.7rem;
+  border-radius: 0.72rem;
+  text-align: center;
+  font-size: 0.86rem;
+  font-weight: 500;
+  transition:
+    transform 0.16s var(--lp-ease-out),
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.lp-price__cta:active {
+  transform: scale(0.98);
+}
+.lp-price__cta--primary {
+  background: var(--lp-accent-bright);
+  color: oklch(1 0 0 / 0.96);
+}
+.lp-price__cta--outline {
+  border: 1px solid var(--lp-card-border);
+  background: var(--lp-soft-bg);
+  color: var(--lp-ink);
+}
+@media (hover: hover) and (pointer: fine) {
+  .lp-price__cta--outline:hover {
+    border-color: var(--lp-card-border-hover);
+  }
+}
+.lp-price__list {
+  position: relative;
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.lp-price__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--lp-ink-dim);
+}
+.lp-price__item .lp-showcase__check {
+  margin-top: 0.02rem;
+}
+
+/* ── Final CTA (section 08) ──────────────────────────────────────────────
+   A bold blueprint panel: faint grid, soft accent bloom, display headline,
+   and the hero's keycap + ghost CTAs — a callback to the top of the page. */
+
+.lp-cta {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.6rem;
+  border: 1px solid var(--lp-card-border);
+  background: linear-gradient(180deg, var(--lp-card-1) 0%, var(--lp-card-2) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--lp-card-rim),
+    0 2px 0 0 var(--lp-card-lip),
+    0 40px 60px -30px var(--lp-card-drop);
+  padding: clamp(3rem, 7vw, 5.5rem) 1.5rem;
+  text-align: center;
+}
+/* faint blueprint grid, pooled toward the top */
+.lp-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--lp-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--lp-line) 1px, transparent 1px);
+  background-size: 30px 30px;
+  -webkit-mask-image: radial-gradient(120% 80% at 50% -10%, #000, transparent 70%);
+  mask-image: radial-gradient(120% 80% at 50% -10%, #000, transparent 70%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+/* soft accent bloom behind the headline */
+.lp-cta::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  width: 40rem;
+  height: 20rem;
+  max-width: 90%;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--lp-glow-1), transparent 68%);
+  pointer-events: none;
+}
+.lp-cta__inner {
+  position: relative;
+}
+.lp-cta__actions {
+  margin-top: 2.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* ── Keycap CTA (designownow "See Plans") ────────────────────────────── */
+
+.lp-key {
+  position: relative;
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 1.05rem;
+  background: linear-gradient(180deg, var(--lp-tray-1) 0%, var(--lp-tray-2) 100%);
+  box-shadow:
+    0 2px 0 0 var(--lp-tray-edge),
+    0 16px 28px -14px var(--lp-tray-shadow),
+    inset 0 1px 0 var(--lp-tray-ring);
+  transition:
+    transform 160ms var(--lp-ease-out),
+    box-shadow 160ms var(--lp-ease-out);
+}
+.lp-key:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 0 0 0 var(--lp-tray-edge),
+    0 8px 14px -10px var(--lp-tray-shadow),
+    inset 0 1px 0 var(--lp-tray-ring);
+}
+
+.lp-key__cap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.72rem 1.6rem 0.72rem 0.72rem;
+  border-radius: 0.82rem;
+  background: linear-gradient(180deg, oklch(0.302 0.005 286.076) 0%, oklch(0.183 0.004 285.994) 55%, oklch(0.116 0.003 285.885) 100%);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.16),
+    inset 0 -3px 8px oklch(0 0 0 / 0.9);
+  overflow: hidden;
+}
+
+/* idle dot-matrix block */
+.lp-key__dots {
+  width: 1.9rem;
+  height: 1.9rem;
+  flex: none;
+  border-radius: 0.5rem;
+  background-color: oklch(0.123 0.003 285.968);
+  background-image: radial-gradient(circle, oklch(1 0 0 / 0.85) 1.1px, transparent 1.35px);
+  background-size: 5.5px 5.5px;
+  background-position: center;
+  box-shadow:
+    inset 0 0 0 1px oklch(1 0 0 / 0.08),
+    inset 0 2px 5px oklch(0 0 0 / 0.9);
+  transition: opacity 200ms ease;
+}
+
+.lp-key__label {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: oklch(1 0 0);
+  white-space: nowrap;
+  transition:
+    opacity 200ms ease,
+    filter 200ms ease;
+}
+
+/* LED arrow marquee revealed on hover */
+.lp-key__leds {
+  position: absolute;
+  inset: 0.55rem 0.9rem;
+  opacity: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='19' height='24' viewBox='0 0 19 24'%3E%3Cg fill='%23fff'%3E%3Ccircle cx='4' cy='4' r='1.7'/%3E%3Ccircle cx='9' cy='8' r='1.7'/%3E%3Ccircle cx='14' cy='12' r='1.7'/%3E%3Ccircle cx='9' cy='16' r='1.7'/%3E%3Ccircle cx='4' cy='20' r='1.7'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: 0 center;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-key:hover .lp-key__label,
+  .lp-key:hover .lp-key__dots {
+    opacity: 0;
+    filter: blur(3px);
+  }
+  .lp-key:hover .lp-key__leds {
+    opacity: 1;
+    animation: lp-leds 0.5s linear infinite;
+  }
+}
+
+@keyframes lp-leds {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 19px;
+  }
+}
+
+/* ── Ghost secondary CTA (metallic outline pill) ─────────────────────── */
+
+.lp-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.5rem;
+  border: 1px solid var(--lp-ghost-border);
+  border-radius: 0.9rem; /* radius family: nav 15px › keycap 17/13px › ghost 14px */
+  background: linear-gradient(180deg, var(--lp-ghost-bg-1), var(--lp-ghost-bg-2));
+  box-shadow: inset 0 1px 0 var(--lp-ghost-ring);
+  color: var(--lp-ink);
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition:
+    transform 160ms var(--lp-ease-out),
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+.lp-ghost:active {
+  transform: scale(0.98);
+}
+.lp-ghost__arrow {
+  transition: transform 200ms var(--lp-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .lp-ghost:hover {
+    border-color: var(--lp-ghost-border-hover);
+    background-color: var(--lp-ghost-hover);
+  }
+  .lp-ghost:hover .lp-ghost__arrow {
+    transform: translate(2px, -2px);
+  }
+}
+
+/* ── Entrance: staggered blurred rise (texts-reveal) ─────────────────── */
+
+.lp-rise {
+  opacity: 0;
+  transform: translateY(16px);
+  filter: blur(6px);
+  animation: lp-rise 0.8s var(--lp-ease-spring) both;
+  animation-delay: var(--lp-delay, 0ms);
+}
+
+@keyframes lp-rise {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* ── Reduced motion (shared primitives) ──────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-rise {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  .lp-key__leds {
+    animation: none !important;
+  }
+}

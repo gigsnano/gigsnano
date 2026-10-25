@@ -1,0 +1,20 @@
+# dependencies / build output
+node_modules/
+.next/
+dist/
+coverage/
+*.tsbuildinfo
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# local env + secrets (examples are committed)
+.env
+.env.*
+!.env.example
+
+# local tooling
+.superpowers/
+.DS_Store
+.workspaces/

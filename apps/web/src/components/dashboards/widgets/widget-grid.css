@@ -1,0 +1,103 @@
+/* Token-aware overrides for react-grid-layout's base styles (imported alongside
+   the library CSS). Keeps drag/resize affordances on-theme in light + dark. */
+
+.dashboard-grid .react-grid-item {
+  transition: transform 200ms ease, width 200ms ease, height 200ms ease;
+}
+
+.dashboard-grid .react-grid-item.react-draggable-dragging,
+.dashboard-grid .react-grid-item.resizing {
+  transition: none;
+  z-index: 3;
+}
+
+/* Drop preview while dragging/resizing */
+.dashboard-grid .react-grid-item.react-grid-placeholder {
+  background: var(--primary);
+  opacity: 0.1;
+  border-radius: var(--radius-xl);
+  transition-duration: 100ms;
+  z-index: 2;
+}
+
+/* Corner resize handle — recolor the library's default to a muted token */
+.dashboard-grid .react-grid-item > .react-resizable-handle::after {
+  border-right: 2px solid var(--muted-foreground);
+  border-bottom: 2px solid var(--muted-foreground);
+  opacity: 0.4;
+}
+
+.dashboard-grid .react-grid-item:hover > .react-resizable-handle::after {
+  opacity: 0.7;
+}
+
+/* GIN-118 widget internals — subtle, professional-dashboard motion.
+   Bars/rings grow from a start value on mount; rows stagger in. Only
+   transform/opacity/known-safe props animate; motion is disabled for
+   reduced-motion users (opacity-only comprehension stays). */
+
+/* A metric bar that grows to its target width on first paint. */
+.gn-grow-bar {
+  transform-origin: left center;
+  animation: gn-grow-bar 520ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@keyframes gn-grow-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Staggered fade/slide for list rows (workload, sprints, activity). */
+.gn-stagger > * {
+  opacity: 0;
+  animation: gn-row-in 320ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+.gn-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.gn-stagger > *:nth-child(2) { animation-delay: 45ms; }
+.gn-stagger > *:nth-child(3) { animation-delay: 90ms; }
+.gn-stagger > *:nth-child(4) { animation-delay: 135ms; }
+.gn-stagger > *:nth-child(5) { animation-delay: 180ms; }
+.gn-stagger > *:nth-child(6) { animation-delay: 225ms; }
+.gn-stagger > *:nth-child(n + 7) { animation-delay: 260ms; }
+
+@keyframes gn-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The SVG donut sweep. */
+.gn-donut-ring {
+  animation: gn-donut 640ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@keyframes gn-donut {
+  from {
+    stroke-dasharray: 0 999;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gn-grow-bar,
+  .gn-donut-ring {
+    animation: none;
+  }
+  .gn-stagger > * {
+    opacity: 1;
+    animation: gn-fade-in 200ms ease both;
+  }
+  @keyframes gn-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+}

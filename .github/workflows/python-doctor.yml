@@ -1,0 +1,53 @@
+# python-doctor — the backend's equivalent of the frontend's react-doctor gate.
+# Runs the python-doctor CLI (security/lint/complexity/structure/exceptions/zen)
+# plus this repo's house rules, scoped to the lines the PR actually changed, so
+# pre-existing findings never block — only regressions do.
+
+name: Python Doctor
+
+on:
+  pull_request:
+    paths: ["apps/api/**", ".github/workflows/python-doctor.yml"]
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: python-doctor-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-doctor:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      # Full history: the scan diffs against the base branch to find the changed lines.
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+          cache-dependency-glob: apps/api/uv.lock
+
+      - run: uv sync --all-extras --dev
+      # Pinned: a different build has different skip rules and thresholds, which is
+      # exactly how a scan passes locally and fails here.
+      - run: uv tool install python-doctor==2026.5.11
+
+      # On a PR "changed" means changed vs the merge base, not vs the last commit:
+      # resetting onto the base leaves the whole PR staged, which --scope staged reads.
+      - name: Scan changed lines
+        run: |
+          if [ -n "${{ github.event.pull_request.base.ref }}" ]; then
+            git fetch --no-tags origin "${{ github.event.pull_request.base.ref }}"
+            git reset --soft "origin/${{ github.event.pull_request.base.ref }}"
+          fi
+          uv run python scripts/python_doctor.py --scope staged

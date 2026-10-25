@@ -1,0 +1,91 @@
+# Vendored BMAD prompt assets. Version-pinned: bump + run the regression suite
+# on any content change (spec §5.1).
+bmad_version: "6.0-gigsnano-2"
+
+personas:
+  mary: personas/mary.md
+  john: personas/john.md
+  sally: personas/sally.md
+  winston: personas/winston.md
+  amelia: personas/amelia.md
+  paige: personas/paige.md
+
+workflows:
+  bmad-brainstorming:
+    persona: mary
+    instructions: workflows/brainstorming.md
+    doc_type: brainstorm
+    title: Brainstorm
+    required_context: []
+  bmad-research:
+    persona: mary
+    instructions: workflows/research.md
+    doc_type: research
+    title: Research Findings
+    required_context: [brainstorm]
+  bmad-product-brief:
+    persona: mary
+    instructions: workflows/product-brief.md
+    doc_type: brief
+    title: Product Brief
+    required_context: [brainstorm, research]
+  bmad-prd:
+    persona: john
+    instructions: workflows/prd.md
+    doc_type: prd
+    title: Product Requirements Document
+    required_context: [brief, brainstorm, research, project_context, document_project]
+  bmad-ux:
+    persona: sally
+    instructions: workflows/ux.md
+    doc_type: ux
+    title: UX Design
+    required_context: [prd, brief]
+  bmad-create-architecture:
+    persona: winston
+    instructions: workflows/architecture.md
+    doc_type: architecture
+    title: Architecture
+    required_context: [prd, ux, project_context]
+  bmad-create-epics-and-stories:
+    persona: john
+    instructions: workflows/epics.md
+    doc_type: epics
+    title: Epics & Stories
+    required_context: [prd, architecture, ux]
+  bmad-check-implementation-readiness:
+    persona: winston
+    instructions: workflows/readiness.md
+    doc_type: readiness
+    title: Implementation Readiness Report
+    required_context: [prd, ux, architecture, epics]
+  bmad-sprint-planning:
+    persona: amelia
+    instructions: workflows/sprint-planning.md
+    doc_type: sprint_plan
+    title: Sprint Plan
+    required_context: [epics, architecture]
+  bmad-document-project:
+    persona: paige
+    instructions: workflows/document-project.md
+    doc_type: document_project
+    title: Project Documentation
+    required_context: []
+  bmad-generate-project-context:
+    persona: mary
+    instructions: workflows/project-context.md
+    doc_type: project_context
+    title: Project Context
+    required_context: [document_project]
+  bmad-create-story:
+    persona: amelia
+    instructions: workflows/create-story.md
+    doc_type: story_file
+    title: Story File
+    required_context: [epics, prd, architecture, ux, project_context]
+  bmad-break-down-epic:
+    persona: john
+    instructions: workflows/break-down-epic.md
+    doc_type: epic-breakdown
+    title: Epic Breakdown
+    required_context: [prd, architecture]

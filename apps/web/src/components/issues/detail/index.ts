@@ -1,0 +1,24 @@
+/** Work-item detail/peek — public exports for page composers. */
+export { IssueDetailToolbar } from "./header/toolbar";
+export { IssuePropertyRow } from "./header/property-row";
+export { IssueDescription } from "./widgets/description";
+export { IssueProperties } from "./properties/properties-section";
+export { IssueActivity } from "./widgets/activity";
+export { IssueWidgetActions } from "./widgets/widget-actions";
+export { IssueDocuments } from "./widgets/documents";
+export { AttachmentViewer } from "./attachments/attachment-viewer";
+export { IssueLinks } from "./widgets/links";
+export { IssueAgentRuns } from "./widgets/agent-runs";
+export { IssueExecutionProfile } from "./widgets/execution-profile";
+export { IssueCodeScope } from "./widgets/code-scope";
+export { IssueDelivery } from "./widgets/delivery";
+export { IssueStaffThis } from "./widgets/staff-this";
+export { IssueImpact } from "./widgets/impact";
+export { IssueRelations } from "./widgets/relations";
+export { IssueTimeTracking } from "./widgets/time-tracking";
+export { AddExistingSubWorkDialog } from "./dialogs/add-existing-sub-work-dialog";
+export { CreateLinkDialog } from "./dialogs/create-link-dialog";
+export { CreateRelationDialog } from "./dialogs/create-relation-dialog";
+export { IssueDocumentPeek } from "./shared/document-peek";
+export { IssueCollapsibleSection } from "./shared/collapsible-section";
+export { IssuePropertyListItem } from "./shared/property-list-item";

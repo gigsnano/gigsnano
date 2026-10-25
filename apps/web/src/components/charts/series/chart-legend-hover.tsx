@@ -1,0 +1,41 @@
+"use client";
+
+import { createContext, type ReactNode, use } from "react";
+
+interface ChartLegendHoverContextValue {
+  hoveredIndex: number | null;
+  setHoveredIndex: (index: number | null) => void;
+}
+
+const ChartLegendHoverContext =
+  createContext<ChartLegendHoverContextValue | null>(null);
+
+function ChartLegendHoverProvider({
+  hoveredIndex,
+  onHoverChange,
+  children,
+}: {
+  hoveredIndex: number | null;
+  onHoverChange: (index: number | null) => void;
+  children: ReactNode;
+}) {
+  const value = { hoveredIndex, setHoveredIndex: onHoverChange };
+
+  return (
+    <ChartLegendHoverContext.Provider value={value}>
+      {children}
+    </ChartLegendHoverContext.Provider>
+  );
+}
+
+export function useChartLegendHover(): ChartLegendHoverContextValue {
+  const context = use(ChartLegendHoverContext);
+  return (
+    context ?? {
+      hoveredIndex: null,
+      setHoveredIndex: () => {
+        /* noop outside ChartLegendHoverProvider */
+      },
+    }
+  );
+}

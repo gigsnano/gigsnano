@@ -1,0 +1,32 @@
+name: Web
+
+on:
+  pull_request:
+    paths: ["apps/web/**", "packages/core/**", "pnpm-lock.yaml", ".github/workflows/web.yml"]
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @gigsnano/web exec tsc --noEmit
+      - run: pnpm --filter @gigsnano/web test
+      - run: pnpm --filter @gigsnano/web build
+        env:
+          NEXT_PUBLIC_USE_MOCKS: "false"
+          NEXT_PUBLIC_API_BASE_URL: /api

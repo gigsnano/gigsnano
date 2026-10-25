@@ -1,0 +1,42 @@
+# Publishes @gigsnano/core (tag core-vX.Y.Z) or @gigsnano/mcp (tag mcp-vX.Y.Z) to npm
+# with npm trusted publishing (GitHub OIDC): no npm token is stored anywhere.
+# One-time setup on npmjs.com: package settings -> Trusted publisher ->
+# GitHub Actions, repo gigsnano/gigsnano, workflow release-packages.yml.
+name: Release packages
+
+on:
+  push:
+    tags: ["core-v*", "mcp-v*"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm install -g npm@latest   # trusted publishing needs npm >= 11.5
+      - run: pnpm install --frozen-lockfile
+      - name: Resolve package
+        id: pkg
+        run: |
+          case "${GITHUB_REF_NAME}" in
+            core-v*) echo "dir=packages/core" >> "$GITHUB_OUTPUT"; echo "version=${GITHUB_REF_NAME#core-v}" >> "$GITHUB_OUTPUT" ;;
+            mcp-v*)  echo "dir=packages/gigsnano-mcp" >> "$GITHUB_OUTPUT"; echo "version=${GITHUB_REF_NAME#mcp-v}" >> "$GITHUB_OUTPUT" ;;
+          esac
+      - name: Check tag matches package.json version
+        working-directory: ${{ steps.pkg.outputs.dir }}
+        run: test "$(node -p 'require("./package.json").version')" = "${{ steps.pkg.outputs.version }}"
+      - run: pnpm build
+        working-directory: ${{ steps.pkg.outputs.dir }}
+      - run: pnpm test
+        working-directory: ${{ steps.pkg.outputs.dir }}
+      - run: npm publish --provenance --access public
+        working-directory: ${{ steps.pkg.outputs.dir }}

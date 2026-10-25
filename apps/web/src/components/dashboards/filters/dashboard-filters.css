@@ -1,0 +1,89 @@
+/* Dashboard-wide filter bar. Motion values follow transitions.dev tokens. */
+
+:root {
+  --text-swap-dur: 150ms;
+  --text-swap-translate-y: 4px;
+  --text-swap-blur: 2px;
+  --text-swap-ease: ease-in-out;
+}
+
+/* Active trigger: a tint, not a new shape — the bar shouldn't reflow when a
+   filter turns on. Colour only, so no layout work. */
+.gn-filter-trigger {
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+.gn-filter-trigger[data-active] {
+  border-color: color-mix(in oklch, var(--primary) 45%, var(--border));
+  background-color: color-mix(in oklch, var(--primary) 7%, var(--background));
+}
+
+/* Multi-select tick: the box fills, the tick settles in from a hair smaller. */
+.gn-filter-check {
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+.gn-filter-check svg {
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 120ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+.gn-filter-check[data-checked] {
+  border-color: var(--primary);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+.gn-filter-check[data-checked] svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* transitions.dev #04 (text states swap), enter phase via keyed remount:
+   the new label rises into place with a cross-blur. */
+.t-label-swap {
+  display: inline-block;
+  transform: translateY(0);
+  filter: blur(0);
+  opacity: 1;
+  transition:
+    transform var(--text-swap-dur) var(--text-swap-ease),
+    filter var(--text-swap-dur) var(--text-swap-ease),
+    opacity var(--text-swap-dur) var(--text-swap-ease);
+}
+@starting-style {
+  .t-label-swap {
+    transform: translateY(var(--text-swap-translate-y));
+    filter: blur(var(--text-swap-blur));
+    opacity: 0;
+  }
+}
+
+/* "Clear" arrives with the first active filter: fade + a slight scale. */
+.t-filter-clear {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 150ms var(--ease-out),
+    transform 150ms var(--ease-out);
+}
+@starting-style {
+  .t-filter-clear {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-label-swap,
+  .t-filter-clear,
+  .gn-filter-check svg {
+    transition: opacity 150ms ease;
+    transform: none;
+    filter: none;
+  }
+}

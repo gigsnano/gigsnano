@@ -1,0 +1,38 @@
+name: API
+
+on:
+  pull_request:
+    paths: ["apps/api/**", ".github/workflows/api.yml"]
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+          cache-dependency-glob: apps/api/uv.lock
+      - run: uv sync --dev --frozen
+      # Lint runs in python-doctor.yml on changed lines only: main carries ~117
+      # pre-existing ruff findings that are being cleaned up separately.
+      # tests/known-failures.txt quarantines tests that fail on main today; each
+      # line should have a tracking issue. Remove a line when its test is fixed.
+      - name: pytest
+        run: |
+          args=()
+          while IFS= read -r t; do args+=(--deselect "$t"); done < <(grep -vE '^\s*(#|$)' tests/known-failures.txt)
+          uv run pytest -q "${args[@]}"

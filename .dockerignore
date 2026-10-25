@@ -1,0 +1,11 @@
+**/node_modules
+**/.next
+**/.env*
+!**/.env.example
+**/tsconfig.tsbuildinfo
+**/coverage
+.git
+.superpowers
+tools
+apps/api/.venv
+apps/api/.workspaces

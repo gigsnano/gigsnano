@@ -1,0 +1,452 @@
+/* GigsNano skin for dhtmlx-gantt (GIN-350/GIN-315). Loaded after the library CSS
+   so these win. Everything is theme-token driven so light + dark both read right.
+
+   Three jobs:
+   1. Structure — real borders, row bands and week/month rules, so the chart reads
+      as a grid instead of a flat grey field.
+   2. Colour — bars carry the SAME status palette as the board, donut and activity
+      chart (`STORY_STATUS_STROKE`), so a status is one colour app-wide.
+   3. Chrome — token-coloured header, scrollbars, tree guides, today marker. */
+
+.gantt_container {
+  font-family: inherit;
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 0;
+}
+
+/* ── Panel divide ──────────────────────────────────────────────────────────
+   The grid/timeline seam is the single most important line in the chart; the
+   library ships it near-invisible. */
+.gantt_layout_cell.grid_cell,
+.gantt_grid {
+  border-right: 1px solid var(--border);
+}
+.gantt_layout_cell {
+  border-color: var(--border);
+}
+
+/* ── Headers ─────────────────────────────────────────────────────────────── */
+.gantt_grid_scale,
+.gantt_task_scale {
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.gantt_grid_head_cell {
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-right: 1px solid var(--border);
+}
+.gantt_scale_line {
+  border-top-color: var(--border);
+}
+/* The upper scale (month / week) gets a heavier rule so the two header rows
+   don't read as one undifferentiated band. */
+.gantt_scale_line:first-child .gantt_scale_cell {
+  font-weight: 600;
+  color: var(--foreground);
+  border-right: 1px solid var(--border);
+}
+.gantt_scale_cell {
+  color: var(--muted-foreground);
+  border-right: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+/* ── Rows: bands + separators ────────────────────────────────────────────── */
+.gantt_row,
+.gantt_task_row {
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+.gantt_row.odd,
+.gantt_task_row.odd {
+  background-color: color-mix(in srgb, var(--muted) 40%, transparent);
+}
+.gantt_cell {
+  border-right: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  color: var(--foreground);
+}
+/* Hover reads across BOTH panes — dhtmlx mirrors the class onto the task row. */
+.gantt_row:hover,
+.gantt_task_row:hover {
+  background-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.gantt_row.gantt_selected,
+.gantt_task_row.gantt_selected {
+  background-color: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+/* ── Timeline cells: day / week / month rules ────────────────────────────── */
+.gantt_task_cell {
+  border-right: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
+}
+/* Non-working days — a shaded band, never the only cue. */
+.gantt_task_cell.gn-gantt-weekend {
+  background-color: color-mix(in srgb, var(--muted-foreground) 9%, transparent);
+}
+/* First day of a week/month gets a full-strength rule so periods are countable
+   at a glance instead of blurring into an even stripe field. */
+.gantt_task_cell.gn-gantt-period {
+  border-right-color: var(--border);
+  box-shadow: inset 1px 0 0 var(--border);
+}
+
+/* ── Task bars: the status palette ───────────────────────────────────────── */
+.gantt_task_line {
+  border: 1px solid color-mix(in srgb, var(--gn-bar) 70%, var(--foreground) 10%);
+  background-color: color-mix(in srgb, var(--gn-bar) 22%, var(--background));
+  border-radius: 5px;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--foreground) 8%, transparent);
+  transition:
+    box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gantt_task_line:hover {
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--gn-bar) 35%, transparent);
+  filter: saturate(1.1);
+}
+/* The completed portion is the saturated fill; the remainder stays tinted. This
+   makes progress legible without a second colour axis. */
+.gantt_task_line .gantt_task_progress {
+  background-color: var(--gn-bar);
+  border-radius: 4px 0 0 4px;
+  opacity: 0.85;
+}
+.gantt_task_content {
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 0 8px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Bars too narrow for their label push it outside rather than clipping to junk. */
+.gantt_task_line .gantt_task_content {
+  mix-blend-mode: normal;
+}
+
+.gn-bar-todo {
+  --gn-bar: var(--color-slate-400, #94a3b8);
+}
+.gn-bar-in_progress {
+  --gn-bar: var(--color-blue-500, #3b82f6);
+}
+.gn-bar-in_review {
+  --gn-bar: var(--color-amber-500, #f59e0b);
+}
+.gn-bar-done {
+  --gn-bar: var(--color-emerald-500, #10b981);
+}
+/* Past its due date and not done — a red hairline on the bar's trailing edge.
+   Colour is never the only cue: the row also carries an `⚠` in the Due column. */
+.gantt_task_line.gn-bar-overdue {
+  border-color: var(--destructive);
+  box-shadow: inset -3px 0 0 var(--destructive);
+}
+
+/* Rollup summary bars for parents (auto_types) — a slim, flat container bar so an
+   epic reads as a span, not another work item. */
+.gantt_task_line.gantt_project {
+  --gn-bar: var(--muted-foreground);
+  height: 12px !important;
+  margin-top: 8px;
+  border-radius: 2px;
+  background-color: color-mix(in srgb, var(--muted-foreground) 35%, transparent);
+  border-color: var(--muted-foreground);
+  box-shadow: none;
+}
+.gantt_task_line.gantt_project .gantt_task_progress {
+  background-color: var(--muted-foreground);
+  border-radius: 1px;
+}
+.gantt_task_line.gantt_project .gantt_task_content {
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+/* ── Tree ────────────────────────────────────────────────────────────────── */
+/* Indent guides make depth countable without measuring pixel offsets. */
+.gantt_tree_indent {
+  width: 16px;
+  box-shadow: inset 8px 0 0 -7px color-mix(in srgb, var(--border) 90%, transparent);
+}
+.gantt_tree_icon.gantt_open,
+.gantt_tree_icon.gantt_close {
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gantt_tree_content {
+  font-size: 13px;
+}
+.gantt_tree_icon.gantt_folder_open,
+.gantt_tree_icon.gantt_folder_closed,
+.gantt_tree_icon.gantt_file {
+  opacity: 0.55;
+}
+
+/* ── Relation arrows ─────────────────────────────────────────────────────
+   dhtmlx draws each segment as a zero-height div with a `border-bottom`, then
+   rotates it — so the line style lives on the BORDER, not on a background, and
+   dash/colour apply the same whichever way a segment runs. (The old rule set
+   `background-color` on the wrapper's div, which paints nothing on a
+   zero-height element — arrows were silently rendering in the library's own
+   blue.) */
+
+/* A real dependency: solid, readable, directional. */
+.gantt_task_link.gn-link-blocking .gantt_link_direction {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: color-mix(in srgb, var(--muted-foreground) 85%, transparent);
+}
+.gantt_task_link.gn-link-blocking .gantt_link_arrow_right {
+  border-left-color: color-mix(in srgb, var(--muted-foreground) 85%, transparent);
+}
+
+/* An informational relation (relates-to / duplicate): dashed and lighter. It
+   carries no ordering, so it must read as an association, not a constraint —
+   dashes are the cue, weight is the reinforcement. */
+.gantt_task_link.gn-link-related .gantt_link_direction {
+  border-bottom-style: dashed;
+  border-bottom-width: 2px;
+  border-bottom-color: color-mix(in srgb, var(--muted-foreground) 50%, transparent);
+}
+.gantt_task_link.gn-link-related .gantt_link_arrow_right {
+  border-left-color: color-mix(in srgb, var(--muted-foreground) 50%, transparent);
+}
+
+/* Hover promotes either kind without changing its style, so a dashed line never
+   momentarily reads as a dependency. */
+.gantt_task_link:hover .gantt_link_direction {
+  border-bottom-color: var(--primary);
+}
+.gantt_task_link:hover .gantt_link_arrow_right {
+  border-left-color: var(--primary);
+}
+
+/* ── Today ───────────────────────────────────────────────────────────────
+   Three cues, because one is never enough at every zoom: the marker line is
+   precise but invisible once scrolled away; the column tint survives a glance;
+   the header pill is the calendar convention people already read. */
+
+/* 1. The vertical line through the chart, labelled at the top. */
+.gantt_marker.gn-gantt-today {
+  background-color: var(--primary);
+  width: 2px;
+  opacity: 1;
+}
+.gantt_marker.gn-gantt-today .gantt_marker_content {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* 2. Today's column, tinted the full height of the chart. Kept faint so it
+      never competes with the bars sitting on top of it — and it wins over the
+      weekend/period shading, since today matters more than either. */
+.gantt_task_cell.gn-gantt-today-col {
+  background-color: color-mix(in srgb, var(--primary) 10%, transparent);
+  box-shadow: inset 1px 0 0 color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+/* 3. The header pill — today's date number circled, the way a calendar marks
+      it. `min-width` + `1/1` aspect keeps a 1- and 2-digit day the same shape
+      instead of an oval on the 9th and a circle on the 19th. */
+.gantt_scale_cell.gn-gantt-today-head {
+  position: relative;
+  /* Own stacking context, so the pill's z-index:-1 lands above this cell's own
+     background instead of falling behind the header and disappearing. */
+  isolation: isolate;
+  color: var(--primary-foreground);
+  font-weight: 700;
+  overflow: visible;
+}
+.gantt_scale_cell.gn-gantt-today-head::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  min-width: 20px;
+  aspect-ratio: 1 / 1;
+  height: 20px;
+  border-radius: 999px;
+  background-color: var(--primary);
+  transform: translate(-50%, -50%);
+  z-index: -1;
+}
+
+/* ── Scrollbars ──────────────────────────────────────────────────────────
+   globals.css `@layer base` hides EVERY scrollbar app-wide:
+
+     * { scrollbar-width: none }
+     *::-webkit-scrollbar { display: none }
+
+   dhtmlx's horizontal "scrollbar" is a real overflow div, so that rule erased
+   it — which is why earlier dates were unreachable even once the widget was
+   sized correctly. These selectors are unlayered, so they beat the base layer.
+   Same escape hatch `.gn-kanban` / `.gn-sheet-scroll` already use. */
+.gantt_hor_scroll,
+.gantt_ver_scroll {
+  background-color: color-mix(in srgb, var(--muted) 60%, transparent);
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+  -ms-overflow-style: auto;
+}
+.gantt_hor_scroll::-webkit-scrollbar,
+.gantt_ver_scroll::-webkit-scrollbar {
+  display: block;
+  width: 10px;
+  height: 10px;
+}
+.gantt_hor_scroll::-webkit-scrollbar-thumb,
+.gantt_ver_scroll::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 6px;
+}
+.gantt_hor_scroll::-webkit-scrollbar-thumb:hover,
+.gantt_ver_scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+.gantt_hor_scroll::-webkit-scrollbar-track,
+.gantt_hor_scroll::-webkit-scrollbar-corner,
+.gantt_ver_scroll::-webkit-scrollbar-track,
+.gantt_ver_scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ── Resize splitter between the timeline and the unscheduled backlog ────── */
+.gn-gantt-splitter {
+  position: relative;
+  height: 10px;
+  flex-shrink: 0;
+  cursor: row-resize;
+  background-color: var(--background);
+  border-top: 1px solid var(--border);
+  touch-action: none;
+}
+.gn-gantt-splitter::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 3px;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  background-color: color-mix(in srgb, var(--muted-foreground) 35%, transparent);
+  transition:
+    background-color 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gn-gantt-splitter:hover::after,
+.gn-gantt-splitter:focus-visible::after,
+.gn-gantt-splitter[data-dragging="true"]::after {
+  background-color: var(--primary);
+  width: 64px;
+}
+.gn-gantt-splitter:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gantt_task_line,
+  .gantt_tree_icon.gantt_open,
+  .gantt_tree_icon.gantt_close,
+  .gn-gantt-splitter::after {
+    transition: none;
+  }
+}
+
+/* ── Schedule health (GIN-379 §12) ──────────────────────────────────────────
+   Health rides on top of the status colour rather than replacing it: a reader
+   still needs to know what state the work is in, not only that it is late. Each
+   state carries a border/pattern as well as a hue, so the cue survives
+   greyscale, colour-blindness and print — the grid glyph and the tooltip say it
+   in words too. */
+.gantt_task_line.gn-bar-health-overdue {
+  outline: 2px solid var(--destructive);
+  outline-offset: -2px;
+}
+.gantt_task_line.gn-bar-health-blocked {
+  /* Hatching, not just a colour: "blocked" must read as obstructed at a glance. */
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--destructive) 45%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+  outline: 1px solid color-mix(in srgb, var(--destructive) 60%, transparent);
+  outline-offset: -1px;
+}
+.gantt_task_line.gn-bar-health-at_risk {
+  outline: 2px dashed color-mix(in srgb, var(--destructive) 55%, transparent);
+  outline-offset: -2px;
+}
+.gantt_task_line.gn-bar-health-unassigned {
+  outline: 1px dashed var(--muted-foreground);
+  outline-offset: -1px;
+}
+
+/* ── Summary rows and bars (GIN-379 §1) ─────────────────────────────────────
+   A parent is a rollup, not a piece of work. It gets its own row tint, heavier
+   label and a bracket-style bar so it cannot be mistaken for something someone
+   is actually doing this week. */
+.gantt_row.gantt_project,
+.gantt_task_row.gantt_project {
+  background-color: color-mix(in srgb, var(--muted) 55%, transparent);
+  font-weight: 600;
+}
+.gantt_task_line.gantt_project {
+  background-color: color-mix(in srgb, var(--muted-foreground) 55%, transparent);
+  border-color: var(--muted-foreground);
+  border-radius: 2px;
+  height: 12px !important;
+  margin-top: 4px;
+}
+/* Bigger expand/collapse target — the 12px default is a miss-click generator. */
+.gantt_tree_icon.gantt_open,
+.gantt_tree_icon.gantt_close {
+  width: 22px;
+  height: 22px;
+  background-size: 16px 16px;
+}
+
+/* Milestones render as diamonds (GIN-379 §9): a deadline is a moment, and a
+   moment drawn as a one-day bar disappears among days of work. */
+.gantt_task_line.gantt_milestone {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* ── Legend swatches ───────────────────────────────────────────────────────── */
+.gn-legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 8px;
+  border-radius: 2px;
+  background-color: currentColor;
+}
+.gn-legend-diamond {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  transform: rotate(45deg);
+  background-color: var(--primary);
+}
+.gn-legend-summary {
+  display: inline-block;
+  width: 14px;
+  height: 5px;
+  border-radius: 1px;
+  background-color: color-mix(in srgb, var(--muted-foreground) 55%, transparent);
+}

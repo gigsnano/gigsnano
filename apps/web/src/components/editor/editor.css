@@ -1,0 +1,204 @@
+/* Seamless inline editor typography. The ProseMirror root is `.gn-prose`; there
+   is no bordered container or toolbar — the document reads as the page body. */
+
+.gn-prose {
+  font-size: 0.975rem;
+  line-height: 1.7;
+  color: var(--foreground);
+}
+
+.gn-prose > * + * {
+  margin-top: 0.7em;
+}
+
+.gn-prose h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin-top: 1.4em;
+}
+
+.gn-prose h2 {
+  font-size: 1.35rem;
+  font-weight: 650;
+  line-height: 1.3;
+  margin-top: 1.2em;
+}
+
+.gn-prose h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1em;
+}
+
+.gn-prose h1:first-child,
+.gn-prose h2:first-child,
+.gn-prose h3:first-child {
+  margin-top: 0;
+}
+
+.gn-prose p {
+  margin: 0;
+}
+
+.gn-prose a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.gn-prose strong {
+  font-weight: 650;
+}
+
+.gn-prose ul,
+.gn-prose ol {
+  padding-left: 1.4em;
+}
+
+.gn-prose ul {
+  list-style: disc;
+}
+
+.gn-prose ol {
+  list-style: decimal;
+}
+
+.gn-prose li {
+  margin: 0.2em 0;
+}
+
+.gn-prose li p {
+  margin: 0;
+}
+
+.gn-prose blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1em;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.gn-prose hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5em 0;
+}
+
+.gn-prose code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.85em;
+  background: var(--muted);
+  padding: 0.15em 0.35em;
+  border-radius: 0.3rem;
+}
+
+.gn-prose pre {
+  background: var(--muted);
+  border-radius: 0.5rem;
+  padding: 0.9em 1em;
+  overflow-x: auto;
+}
+
+.gn-prose pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.85em;
+}
+
+.gn-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  display: block;
+}
+
+.gn-prose img.ProseMirror-selectednode {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Task lists */
+.gn-prose ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0.2em;
+}
+
+.gn-prose ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+
+.gn-prose ul[data-type="taskList"] li > label {
+  margin-top: 0.28em;
+}
+
+.gn-prose ul[data-type="taskList"] input[type="checkbox"] {
+  width: 0.95em;
+  height: 0.95em;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* Placeholder — only when the whole editor is empty, so a populated
+   description never shows the prompt on a trailing empty paragraph. */
+.gn-prose p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.gn-prose .ProseMirror-gapcursor:after {
+  border-top-color: var(--foreground);
+}
+
+/* Compact comment editor (Plane lite-text style). */
+.gn-comment-editor {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.gn-comment-editor > * + * {
+  margin-top: 0.4em;
+}
+
+.gn-comment-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Mermaid diagram preview (rendered under the editable source in a code block). */
+.gn-mermaid-preview {
+  margin-top: 0.5rem;
+  padding: 0.9em 1em;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--card);
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+.gn-mermaid-preview svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.gn-mermaid-error {
+  color: var(--destructive);
+  font-size: 0.8rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.gn-mermaid-empty {
+  color: var(--muted-foreground);
+  font-size: 0.8rem;
+}

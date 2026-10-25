@@ -1,0 +1,34 @@
+/* Line-number gutter for the inline shiki code peek used by repo citations
+   (`RepoCodeSnippet`). Shiki's default "classic" structure wraps each
+   rendered line in `<span class="line">` separated by literal `\n` text
+   nodes. shiki-highlight.ts strips the outer `<pre>`/`<code>` wrapper (a
+   block element is invalid inside the chat's markdown `<p>`), so this
+   container replaces `<pre>`'s whitespace handling with `whitespace-pre`
+   (see repo-code-snippet.tsx) to keep those `\n`-driven line breaks. We add
+   a gutter with a CSS counter seeded from --snippet-start (the citation's
+   real starting line number), styling only the `::before` pseudo so the
+   `.line` span stays inline and the newline-driven line breaks are
+   untouched. */
+
+.gn-snippet {
+  counter-reset: gn-line calc(var(--snippet-start, 1) - 1);
+}
+
+.gn-snippet pre,
+.gn-snippet code {
+  background: transparent !important;
+  margin: 0;
+  padding: 0;
+}
+
+.gn-snippet .line::before {
+  counter-increment: gn-line;
+  content: counter(gn-line);
+  display: inline-block;
+  width: 2rem;
+  margin-right: 0.85rem;
+  text-align: right;
+  color: var(--muted-foreground);
+  opacity: 0.5;
+  user-select: none;
+}

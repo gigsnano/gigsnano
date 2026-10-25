@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.prod
+.env.prod.settings.json
+.clear-startup.json
+.pytest_cache/
+.ruff_cache/
+.superpowers/
+.workspaces/
+.sonar/.sonar_lock
+.sonar/report-task.txt
+
+# python-doctor caches the last score here; it is per-machine, not shared state.
+.python-doctor/

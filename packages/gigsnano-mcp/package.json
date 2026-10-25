@@ -1,0 +1,36 @@
+{
+  "name": "@gigsnano/mcp",
+  "version": "0.1.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "bin": {
+    "gigsnano-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.24.1",
+    "zod-to-json-schema": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "5.9.3",
+    "vitest": "3.2.6"
+  },
+  "description": "MCP server that lets coding agents read and update GigsNano work items.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gigsnano/gigsnano.git",
+    "directory": "packages/gigsnano-mcp"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

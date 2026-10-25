@@ -1,0 +1,12 @@
+{
+  "name": "gigsnano",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "packageManager": "pnpm@10.34.4",
+  "scripts": {
+    "dev": "pnpm --filter @gigsnano/web dev",
+    "build": "pnpm --filter @gigsnano/web build",
+    "test": "pnpm -r test",
+    "doctor": "pnpm --filter @gigsnano/web doctor"
+  }
+}

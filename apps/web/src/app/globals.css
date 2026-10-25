@@ -1,0 +1,2074 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@source "../../node_modules/streamdown/dist";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-heading);
+  /* Plane-parity body size: work-item list rows/headers render at 13px/1.4
+     (Plane's `text-13` / `text-body-xs`), not Tailwind's 14px `text-sm`. */
+  --text-13: 0.8125rem;
+  --text-13--line-height: 1.4;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  /* Plane-aligned overlay + dialog chrome (consumed as bg-backdrop / shadow-dialog). */
+  --color-backdrop: var(--backdrop);
+  --shadow-dialog: var(--dialog-shadow);
+  --color-surface-2: var(--surface-2);
+  --color-layer-1: var(--layer-1);
+  --color-layer-2: var(--layer-2);
+  --shadow-raised-100: var(--raised-100);
+  --shadow-raised-200: var(--raised-200);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-chart-scale-pattern-color: var(--chart-scale-pattern-color);
+  --color-chart-scale-05: var(--chart-scale-05);
+  --color-chart-scale-04: var(--chart-scale-04);
+  --color-chart-scale-03: var(--chart-scale-03);
+  --color-chart-scale-02: var(--chart-scale-02);
+  --color-chart-scale-01: var(--chart-scale-01);
+  --color-chart-label: var(--chart-label);
+  --color-chart-marker-foreground: var(--chart-marker-foreground);
+  --color-chart-marker-border: var(--chart-marker-border);
+  --color-chart-marker-background: var(--chart-marker-background);
+  --color-chart-tooltip-muted: var(--chart-tooltip-muted);
+  --color-chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --color-chart-tooltip-background: var(--chart-tooltip-background);
+  --chart-brush-border: var(--chart-brush-border);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-crosshair: var(--chart-crosshair);
+  --chart-line-secondary: var(--chart-line-secondary);
+  --chart-line-primary: var(--chart-line-primary);
+  --color-chart-foreground-muted: var(--chart-foreground-muted);
+  --color-chart-foreground: var(--chart-foreground);
+  --color-chart-background: var(--chart-background);
+  --animate-orbit: orbit calc(var(--duration)*1s) linear infinite;
+  @keyframes orbit {
+  0% {
+    transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg));
+    }
+  100% {
+    transform: rotate(calc(var(--angle) * 1deg + 360deg)) translateY(calc(var(--radius) * 1px)) rotate(calc((var(--angle) * -1deg) - 360deg));
+    }
+  }
+}
+
+:root {
+  /* Plane neutrals (packages/tailwind-config/variables.css) — cool-grey hue ~230.
+     Map shadcn text → Plane txt-*: foreground=txt-primary (neutral-1200),
+     muted-foreground=txt-secondary (neutral-1100) — not tertiary, which reads dull
+     when used for most secondary UI copy. */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.2378 0.0029 230.83); /* Plane neutral-1200 / txt-primary */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2378 0.0029 230.83);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2378 0.0029 230.83);
+  /* Brand — Plane brand-default */
+  --primary: oklch(0.4799 0.1158 242.91);
+  --primary-foreground: oklch(0.9848 0.0003 230.66); /* Plane neutral-100 */
+  --secondary: oklch(0.9696 0.0007 230.67); /* Plane neutral-200 */
+  --secondary-foreground: oklch(0.2378 0.0029 230.83);
+  --muted: oklch(0.9543 0.001 230.67); /* Plane neutral-300 */
+  --muted-foreground: oklch(0.4377 0.0066 230.87); /* Plane neutral-1100 / txt-secondary */
+  --accent: oklch(0.9696 0.0007 230.67);
+  --accent-foreground: oklch(0.2378 0.0029 230.83);
+  --destructive: oklch(0.583 0.238666 28.4765);
+  /* Health roles (mobile briefing; available to web as text-success / text-warning). */
+  --success: oklch(0.53 0.12 155);
+  --warning: oklch(0.555 0.13 62);
+  --border: oklch(0.9235 0.001733 230.6853);
+  --input: oklch(0.9235 0.001733 230.6853);
+  --ring: oklch(0.4799 0.1158 242.91);
+  --chart-1: oklch(0.872 0.007 219.6);
+  --chart-2: oklch(0.56 0.021 213.5);
+  --chart-3: oklch(0.45 0.017 213.2);
+  --chart-4: oklch(0.378 0.015 216);
+  --chart-5: oklch(0.275 0.011 216.9);
+  /* Plane uses ~8px cards / ~6px chips */
+  --radius: 0.5rem;
+  --sidebar: oklch(0.9848 0.0003 230.66); /* Plane neutral-100 */
+  --sidebar-foreground: oklch(0.2378 0.0029 230.83);
+  --sidebar-primary: oklch(0.4799 0.1158 242.91);
+  --sidebar-primary-foreground: oklch(0.9848 0.0003 230.66);
+  --sidebar-accent: oklch(0.9696 0.0007 230.67);
+  --sidebar-accent-foreground: oklch(0.2378 0.0029 230.83);
+  --sidebar-border: oklch(0.9235 0.001733 230.6853);
+  --sidebar-ring: oklch(0.4799 0.1158 242.91);
+
+  /* Overlay — Plane --bg-backdrop = alpha-black-500 (30% cool black) */
+  --backdrop: oklch(0.1482 0.0034 196.79 / 30%);
+  /* Dialog chrome — Plane shadow-raised-200 */
+  --dialog-shadow: 0px 1px 2px -1px #292f3d0f, 0px 1px 3px 0px #292f3d0d;
+  /* Create form dialog — Plane EModalPosition.TOP (my-10 / md:my-20), XXXXL width.
+     Horizontal center only; NO vertical -50% translate (that clips tall forms). */
+  --dialog-form-max-width: 56rem;
+  --dialog-form-top: 2.5rem;
+  --dialog-form-top-sm: 5rem;
+  --dialog-form-translate: -50% 0;
+  --dialog-form-max-height: calc(100vh - 5rem);
+  --dialog-form-gutter: 2rem;
+  --dialog-form-pad-x: 1.25rem;
+  --dialog-form-pad-y: 1.25rem;
+  --dialog-form-desc-min-h: 7.5rem;
+  --dialog-form-chip-h: 1.75rem;
+
+  /* Kanban — very light rails (between white and Plane neutral-100). */
+  --surface-2: oklch(0.9848 0.0003 230.66);
+  --layer-1: oklch(0.978 0.0005 230.66);
+  --layer-2: oklch(1 0 0);
+  --border-subtle: oklch(0.9389 0.0014 230.68);
+  --kanban-rail: var(--layer-1);
+  --kanban-board-bg: oklch(1 0 0);
+  --kanban-column-w: 350px;
+  --kanban-column-collapsed-w: 44px;
+  --kanban-gap: 1rem;
+  --kanban-pad-x: 1.35rem;
+  --kanban-pad-y: 0.75rem;
+  --kanban-rail-pad: 0.625rem;
+  --kanban-rail-radius: 0.5rem;
+  --kanban-body-min-h: 7.5rem;
+  --kanban-card-gap: 0.75rem;
+  --kanban-card-pad: 1rem;
+  --kanban-card-radius: 0.5rem;
+  --kanban-card-border: 0.5px;
+  --kanban-card-min-h: 7.75rem;
+  --kanban-card-inner-gap: 0.75rem;
+  --scrollbar-thumb: oklch(0.1482 0.0034 196.79 / 20%);
+  --scrollbar-thumb-hover: oklch(0.1482 0.0034 196.79 / 35%);
+  --raised-100: 0px 1px 6px -1px #292f3d08, 0px 1px 4px 0px #292f3d0a;
+  --raised-200: 0px 1px 2px -1px #292f3d0f, 0px 1px 3px 0px #292f3d0d;
+
+  /* transitions.dev motion tokens */
+  --tabs-dur: 250ms;
+  --tabs-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dropdown-open-dur: 250ms;
+  --dropdown-close-dur: 150ms;
+  --dropdown-pre-scale: 0.97;
+  --dropdown-closing-scale: 0.99;
+  --dropdown-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --error-shake-dur: 80ms;
+  --chart-background: oklch(1 0 0);
+  --chart-foreground: oklch(0.145 0.004 285);
+  --chart-foreground-muted: oklch(0.55 0.014 260);
+  --chart-line-primary: var(--chart-1);
+  --chart-line-secondary: var(--chart-2);
+  --chart-crosshair: oklch(0.4 0.1828 274.34);
+  --chart-grid: oklch(0.9 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-tooltip-background: oklch(0.21 0.006 285 / 0.8);
+  --chart-tooltip-foreground: oklch(0.985 0 0);
+  --chart-tooltip-muted: oklch(0.65 0.01 260);
+  --chart-marker-background: oklch(0.97 0.005 260);
+  --chart-marker-border: oklch(0.85 0.01 260);
+  --chart-marker-foreground: oklch(0.3 0.01 260);
+  --chart-label: oklch(0.45 0.01 260);
+  --chart-scale-01: oklch(0.98 0.003 106);
+  --chart-scale-02: oklch(0.92 0.008 106);
+  --chart-scale-03: oklch(0.82 0.015 106);
+  --chart-scale-04: oklch(0.68 0.02 106);
+  --chart-scale-05: oklch(0.55 0.025 106);
+  --chart-scale-pattern-color: oklch(0.96 0.005 106);
+}
+
+.dark {
+  --background: oklch(0.1689 0.0021 230.81);
+  --foreground: oklch(0.9235 0.001733 230.6853);
+  --card: oklch(0.1932 0.002 230.81);
+  --card-foreground: oklch(0.9235 0.001733 230.6853);
+  --popover: oklch(0.1932 0.002 230.81);
+  --popover-foreground: oklch(0.9235 0.001733 230.6853);
+  --primary: oklch(0.6311 0.126281 238.01);
+  --primary-foreground: oklch(0.1689 0.0021 230.81);
+  --secondary: oklch(0.2378 0.0029 230.83);
+  --secondary-foreground: oklch(0.9235 0.001733 230.6853);
+  --muted: oklch(0.1932 0.002 230.81);
+  --muted-foreground: oklch(0.8455 0.0035 230.72); /* Plane dark neutral-1100 / txt-secondary */
+  --accent: oklch(0.2378 0.0029 230.83);
+  --accent-foreground: oklch(0.9235 0.001733 230.6853);
+  --destructive: oklch(0.7022 0.1892 22.23);
+  --success: oklch(0.75 0.14 155);
+  --warning: oklch(0.8 0.14 75);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.6311 0.126281 238.01);
+  /* Sequential ramp re-tuned for the dark bg: the light ramp goes faint→dark
+     (visible on white), which inverts wrong on dark (the hot end vanished:
+     chart-5 was 1.3:1). Here it climbs dim→bright so the hottest step is the
+     most visible; every step ≥3:1 on --background, monotonic for heat/treemap. */
+  --chart-1: oklch(0.50 0.06 230);
+  --chart-2: oklch(0.60 0.09 230);
+  --chart-3: oklch(0.70 0.11 230);
+  --chart-4: oklch(0.79 0.11 225);
+  --chart-5: oklch(0.87 0.09 220);
+  --sidebar: oklch(0.1932 0.002 230.81);
+  --sidebar-foreground: oklch(0.9235 0.001733 230.6853);
+  --sidebar-primary: oklch(0.6311 0.126281 238.01);
+  --sidebar-primary-foreground: oklch(0.1689 0.0021 230.81);
+  --sidebar-accent: oklch(0.2378 0.0029 230.83);
+  --sidebar-accent-foreground: oklch(0.9235 0.001733 230.6853);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.6311 0.126281 238.01);
+  /* Plane dark backdrop = alpha-black-1000 (80%) */
+  --backdrop: oklch(0.1482 0.0034 196.79 / 80%);
+  /* Elevation on dark surfaces needs deeper, more opaque shadow — the light
+     #292f3d low-alpha shadows were near-invisible against a dark bg. */
+  --dialog-shadow: 0px 1px 2px -1px #00000059, 0px 2px 6px 0px #0000004d;
+  --raised-100: 0px 1px 6px -1px #0000003d, 0px 1px 4px 0px #00000033;
+  --raised-200: 0px 1px 3px -1px #0000004d, 0px 2px 6px 0px #00000040;
+  --surface-2: oklch(0.1932 0.002 230.81);
+  --layer-1: oklch(0.2158 0.0025 230.82);
+  --layer-2: oklch(0.2378 0.0029 230.83);
+  --border-subtle: oklch(1 0 0 / 10%);
+  --kanban-rail: var(--layer-1);
+  --kanban-board-bg: var(--surface-2);
+  --scrollbar-thumb: oklch(1 0 0 / 20%);
+  --scrollbar-thumb-hover: oklch(1 0 0 / 35%);
+  --chart-background: oklch(0.145 0 0);
+  --chart-foreground: oklch(0.45 0 0);
+  --chart-foreground-muted: oklch(0.65 0.01 260);
+  --chart-crosshair: oklch(0.45 0 0);
+  --chart-grid: oklch(0.25 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-marker-background: oklch(0.25 0.01 260);
+  --chart-marker-border: oklch(0.4 0.01 260);
+  --chart-marker-foreground: oklch(0.9 0 0);
+  --chart-label: oklch(0.75 0.01 260);
+  --chart-scale-01: oklch(0.28 0.03 270);
+  --chart-scale-02: oklch(0.38 0.04 270);
+  --chart-scale-03: oklch(0.48 0.05 270);
+  --chart-scale-04: oklch(0.58 0.06 270);
+  --chart-scale-05: oklch(0.68 0.07 270);
+  --chart-scale-pattern-color: oklch(0.145 0 0);
+}
+
+/* Touch screens: iOS Safari zooms into any focused field set under 16px and
+   never zooms back out, so small fields get 16px there. Unlayered so it beats
+   the `text-sm` utility; fields already sized larger keep their size. */
+@media (pointer: coarse) {
+  :is(input:not([type="checkbox"], [type="radio"], [type="range"]), textarea, select):not(
+      .text-base,
+      .text-lg,
+      .text-xl,
+      .text-2xl,
+      .text-3xl,
+      .text-4xl
+    ) {
+    font-size: 16px;
+  }
+}
+
+@layer base {
+  /* Touch: no grey tap flash (controls carry their own :active feedback) and
+     no double-tap-zoom wait before a tap registers. */
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  a,
+  button {
+    touch-action: manipulation;
+  }
+  * {
+    @apply border-border outline-ring/50;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* Match Plane's global font rendering: disable Inter's contextual
+       ligatures/alternates and hint for legibility so letterforms render
+       identically to Plane (see packages/tailwind-config/index.css). */
+    font-variant-ligatures: none;
+    -webkit-font-variant-ligatures: none;
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  /* Headings use the loaded heading face (Figtree app-wide, Space Grotesk under
+     the marketing subtree via its --font-heading override) instead of falling
+     back to the Inter body font. balance kills orphaned words on short headings.
+     Size/weight/tracking stay per-heading via utility classes. */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    text-wrap: balance;
+  }
+}
+
+/* ── Dual-rail workspace shell ───────────────────────────────────────── */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Card / content resize (transitions.dev #01) */
+  --resize-dur: 320ms;
+  --resize-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Avatar group "comb" hover (transitions.dev #11) */
+  --avatar-lift: -4px;
+  --avatar-dur: 320ms;
+  --avatar-scale: 1.08;
+  --avatar-falloff: 0.45;
+  --avatar-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
+  --avatar-ease-out: cubic-bezier(0.34, 3.85, 0.64, 1);
+
+  /* Skeleton reveal (transitions.dev #14) */
+  --pulse-dur: 1000ms;
+  --pulse-count: 1;
+  --pulse-min: 0.5;
+  --reveal-dur: 400ms;
+  --reveal-blur: 2px;
+  --reveal-ease: ease-in-out;
+
+  /* Texts reveal stagger (transitions.dev #18) */
+  --stagger-dur: 500ms;
+  --stagger-offset: 40ms;
+  --stagger-rise: 12px;
+  --stagger-blur: 3px;
+  --stagger-distance: 12px;
+  --stagger-stagger: 40ms;
+  --stagger-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Plane create-work-item dialog: TOP position, no vertical centering translate.
+   Geometry tokens live on :root; components only apply these classes. */
+@layer components {
+.gn-dialog-form {
+  position: fixed;
+  z-index: 50;
+  top: var(--dialog-form-top);
+  left: 50%;
+  width: calc(100% - var(--dialog-form-gutter));
+  max-width: var(--dialog-form-max-width);
+  max-height: var(--dialog-form-max-height);
+  translate: var(--dialog-form-translate);
+  transform: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  border-radius: var(--radius);
+  box-shadow: var(--dialog-shadow);
+}
+@media (min-width: 768px) {
+  .gn-dialog-form {
+    top: var(--dialog-form-top-sm);
+    max-height: calc(100vh - 10rem);
+  }
+}
+.gn-dialog-form-pad {
+  padding-inline: var(--dialog-form-pad-x);
+  padding-top: var(--dialog-form-pad-y);
+}
+.gn-dialog-form-desc {
+  min-height: var(--dialog-form-desc-min-h);
+}
+.gn-dialog-form-chip {
+  height: var(--dialog-form-chip-h);
+}
+/* Three-column dialogs (step rail · form · live summary). At the default width
+   the form column is left ~300px and every label wraps; this gives it ~550px.
+   Still fluid below the cap — `.gn-dialog-form` sizes off the viewport. */
+.gn-dialog-form-wide {
+  --dialog-form-max-width: 64rem;
+}
+
+/* Plane kanban: white board + gray column rails; cards float on the rail. */
+.gn-board-surface {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--kanban-board-bg);
+}
+.gn-kanban {
+  display: flex;
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  gap: var(--kanban-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--kanban-board-bg);
+  padding: var(--kanban-pad-y) var(--kanban-pad-x);
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+.gn-kanban::-webkit-scrollbar {
+  display: block;
+  width: 8px;
+  height: 8px;
+}
+.gn-kanban::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--scrollbar-thumb);
+}
+.gn-kanban::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+.gn-kanban::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ── Vertical scroll region with a visible scrollbar ─────────────────── */
+/* The base layer hides every scrollbar, which leaves bounded popovers (e.g. the
+   Add-widget catalogue, GIN-488) with no affordance that more content exists.
+   Themed, always-visible thumb + contained overscroll so the page behind a
+   popover never scrolls with it. */
+.gn-scroll-y {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+.gn-scroll-y::-webkit-scrollbar {
+  display: block;
+  width: 8px;
+}
+.gn-scroll-y::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--scrollbar-thumb);
+}
+.gn-scroll-y::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+.gn-scroll-y::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ── Spreadsheet 2D scroll region ────────────────────────────────────── */
+/* The base layer hides all scrollbars (`* { scrollbar-width: none }`), which
+   leaves the wide worksheet table with no visible affordance to scroll its
+   overflowing columns. Re-enable a thin, themed scrollbar on both axes here —
+   the same treatment `.gn-kanban` gets. */
+.gn-sheet-scroll {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+.gn-sheet-scroll::-webkit-scrollbar {
+  display: block;
+  width: 10px;
+  height: 10px;
+}
+.gn-sheet-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background: var(--scrollbar-thumb);
+  background-clip: padding-box;
+}
+.gn-sheet-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+  background-clip: padding-box;
+}
+.gn-sheet-scroll::-webkit-scrollbar-track,
+.gn-sheet-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.gn-kanban-col {
+  display: flex;
+  width: var(--kanban-column-w);
+  flex-shrink: 0;
+  flex-direction: column;
+  align-self: stretch;
+  min-height: 0;
+  max-height: 100%;
+  padding: var(--kanban-rail-pad);
+  padding-top: 0;
+  border-radius: var(--kanban-rail-radius);
+  background-color: var(--kanban-rail);
+  transition:
+    width 200ms var(--ease-out, ease-out),
+    background-color 150ms ease-out;
+}
+.gn-kanban-col.is-drag-over {
+  background-color: color-mix(in oklch, var(--kanban-rail) 92%, var(--foreground));
+}
+.gn-kanban-col.is-collapsed {
+  width: var(--kanban-column-collapsed-w);
+  padding-inline: 0.25rem;
+  cursor: pointer;
+}
+.gn-kanban-col-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.375rem;
+  width: 100%;
+  padding-block: 0.5rem 0.25rem;
+  background: transparent;
+}
+.gn-kanban-col.is-collapsed .gn-kanban-col-header {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+  padding-block: 0.5rem;
+}
+.gn-kanban-col-icon {
+  display: flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+.gn-kanban-col-title {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.gn-kanban-col.is-collapsed .gn-kanban-col-title {
+  flex: 0 0 auto;
+  max-height: 12rem;
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  white-space: nowrap;
+}
+.gn-kanban-col-count {
+  flex-shrink: 0;
+  padding-inline: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+}
+.gn-kanban-col.is-collapsed .gn-kanban-col-count {
+  display: block;
+  padding-inline: 0;
+  writing-mode: horizontal-tb;
+}
+.gn-kanban-col-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.125rem;
+  margin-left: auto;
+}
+/* Plane: expand control stays near the top of a collapsed rail. */
+.gn-kanban-col.is-collapsed .gn-kanban-col-actions {
+  order: -1;
+  margin-left: 0;
+  margin-top: 0;
+}
+.gn-kanban-col-toggle {
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  border-radius: 0.25rem;
+  color: var(--foreground);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: background-color 150ms ease-out, color 150ms ease-out, opacity 150ms ease-out;
+}
+.gn-kanban-col-toggle:hover,
+.gn-kanban-col.is-collapsed .gn-kanban-col-toggle {
+  opacity: 1;
+  background: color-mix(in oklch, var(--foreground) 6%, transparent);
+  color: var(--foreground);
+}
+.gn-kanban-col.is-collapsed .gn-kanban-col-body {
+  display: none;
+}
+.gn-kanban-col-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--kanban-card-gap);
+  min-height: var(--kanban-body-min-h);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-block: 0.125rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+.gn-kanban-col-body::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+.gn-kanban-col-body::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--scrollbar-thumb);
+}
+.gn-kanban-col-body::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+.gn-kanban-col-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.gn-kanban-card {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--kanban-card-min-h);
+  height: auto;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: var(--kanban-card-inner-gap);
+  overflow: hidden;
+  border-radius: var(--kanban-card-radius);
+  border: var(--kanban-card-border) solid var(--border-subtle);
+  background: var(--layer-2);
+  padding: var(--kanban-card-pad);
+  text-align: left;
+  box-shadow: var(--raised-100);
+  outline: 0.5px solid transparent;
+  transition:
+    border-color 150ms ease-out,
+    box-shadow 150ms ease-out;
+}
+.gn-kanban-card:not([aria-disabled="true"]):hover {
+  border-color: color-mix(in oklch, var(--border-subtle) 30%, var(--foreground));
+  box-shadow: var(--raised-200);
+}
+.gn-kanban-card-title {
+  display: -webkit-box;
+  flex: 0 0 auto;
+  margin: 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--foreground);
+  word-break: break-word;
+}
+.gn-kanban-card-props {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: auto;
+  padding-top: 0.125rem;
+  color: var(--foreground);
+}
+.gn-kanban-prop {
+  display: inline-flex;
+  height: 1.5rem;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding-inline: 0.25rem;
+  border-radius: 0.25rem;
+  border: 0.5px solid transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+.gn-kanban-prop[data-active="true"] {
+  color: var(--foreground);
+  border-color: var(--border-subtle);
+  background: color-mix(in oklch, var(--foreground) 3%, transparent);
+}
+.gn-kanban-prop-label {
+  max-width: 5.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1;
+}
+} /* end @layer components — dialog + kanban */
+
+/* The inner card is a grid: panel (var) · content (1fr). The panel column
+   animates to 0 on collapse; the panel keeps its intrinsic --panel-w and is
+   clipped by the card's overflow, so it slides away instead of squishing.
+   Rail A + the top bar sit OUTSIDE this card — they are the seamless dark
+   frame; the card floats inside it with an inset gap. */
+.workspace-card {
+  display: grid;
+  /* panel (var) · content (1fr) · GigsAI pane (0 until opened). Phones start
+     with both side tracks at 0 — the panel and pane overlay instead (below). */
+  grid-template-columns: 0px minmax(0, 1fr) 0px;
+  /* single row pinned to the card height so the panel + content fill it and
+     each scrolls internally instead of growing the whole card. */
+  grid-template-rows: minmax(0, 1fr);
+  transition: grid-template-columns 220ms var(--ease-drawer);
+}
+/* Pinned so content keeps the middle track when the panel cell is taken out
+   of flow on phones. */
+.workspace-card > main {
+  grid-column: 2;
+}
+@media (width >= 48rem) {
+  .workspace-card {
+    grid-template-columns: var(--panel-w, 260px) minmax(0, 1fr) 0px;
+  }
+  html[data-panel-collapsed="true"] .workspace-card {
+    grid-template-columns: 0px minmax(0, 1fr) 0px;
+  }
+}
+@media (width >= 64rem) {
+  html[data-ai-open="true"] .workspace-card {
+    grid-template-columns: var(--panel-w, 260px) minmax(0, 1fr) var(--ai-w, 400px);
+  }
+  html[data-ai-open="true"][data-panel-collapsed="true"] .workspace-card {
+    grid-template-columns: 0px minmax(0, 1fr) var(--ai-w, 400px);
+  }
+}
+
+/* Below md the shell is a phone layout: the top bar's menu button opens a
+   full-height navigation sheet made of Rail A + the active Rail B panel, over a
+   full-viewport scrim. Rail and panel stay mounted where they are; on phones
+   they are fixed to the viewport and slide by the same distance (--sheet-w), so
+   they move as one surface. Driven by the non-persisted data-panel-mobile-open
+   (absent before hydration = closed, so no flash). */
+.panel-scrim {
+  display: none;
+}
+@media (width < 48rem) {
+  :root {
+    --sheet-panel-w: min(var(--panel-w, 260px), calc(100vw - 3.5rem - 3rem));
+    --sheet-w: calc(3.5rem + var(--sheet-panel-w));
+  }
+  .app-rail,
+  .workspace-panel-cell {
+    position: fixed;
+    inset-block: 0;
+    z-index: 51;
+    transform: translateX(calc(-1 * var(--sheet-w)));
+    visibility: hidden;
+    /* Exit is quicker than the entrance. */
+    transition:
+      transform 180ms var(--ease-drawer),
+      visibility 0s linear 180ms;
+  }
+  .app-rail {
+    left: 0;
+  }
+  .workspace-panel-cell {
+    --panel-sheet-w: var(--sheet-panel-w);
+    left: 3.5rem;
+    background: var(--background);
+    box-shadow: var(--raised-200);
+  }
+  html[data-panel-mobile-open="true"] .app-rail,
+  html[data-panel-mobile-open="true"] .workspace-panel-cell {
+    transform: none;
+    visibility: visible;
+    transition: transform 220ms var(--ease-drawer);
+  }
+  .panel-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 180ms var(--ease-out),
+      visibility 0s linear 180ms;
+  }
+  html[data-panel-mobile-open="true"] .panel-scrim {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 220ms var(--ease-out);
+  }
+}
+/* Below lg a 400px GigsAI column would crush the content, so the pane
+   overlays the card from the right instead (it unmounts when closed). */
+@media (width < 64rem) {
+  .workspace-card > .ai-pane {
+    position: absolute;
+    inset-block: 0;
+    right: 0;
+    z-index: 32;
+    max-width: 100%;
+    box-shadow: var(--raised-200);
+    animation: ai-pane-in 220ms var(--ease-drawer);
+  }
+}
+/* Phones: the pane is a full-screen sheet over the whole shell (top bar
+   included), so the conversation gets every pixel. */
+@media (width < 48rem) {
+  .workspace-card > .ai-pane {
+    position: fixed;
+    inset: 0;
+    /* Same layer as Radix portals, which come later in the DOM, so the
+       pane's own model/history menus still open above it. */
+    z-index: 50;
+    width: auto;
+    height: 100dvh;
+    box-shadow: none;
+  }
+}
+@keyframes ai-pane-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+/* Work-item detail canvas (GIN-479): reading column + Properties drawer. Same
+   animated-track pattern as .workspace-card above, so the drawer collapses by
+   handing its width back rather than by unmounting. Single column below xl —
+   there is no width to hand back, so Properties is an overlay sheet there. */
+.work-item-canvas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  transition: grid-template-columns 220ms var(--ease-drawer);
+}
+@media (width >= 80rem) {
+  .work-item-canvas {
+    grid-template-columns: minmax(0, 1fr) var(--wi-drawer, 20rem);
+  }
+}
+
+/* The pane keeps its intrinsic width and is clipped by the card overflow, so it
+   slides in from the right instead of squishing while the column animates. */
+.ai-pane {
+  width: var(--ai-w, 400px);
+  overflow: hidden;
+}
+html.panel-resizing .workspace-card {
+  transition: none;
+}
+html.panel-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+/* Expand button lives in the content area; visible only when collapsed. Driven
+   by the html attribute (script-seeded + store-synced) so there is no
+   React/SSR conditional to mismatch on. */
+.panel-expand-btn {
+  display: none;
+}
+/* md+ only: phones open navigation from the top bar's menu button instead. */
+@media (width >= 48rem) {
+  html[data-panel-collapsed="true"] .panel-expand-btn {
+    display: inline-flex;
+  }
+  /* When collapsed, reserve room at the content's top-left so the route header /
+     content clears the floating expand button instead of overlapping it. */
+  html[data-panel-collapsed="true"] .workspace-card main {
+    padding-left: 2.75rem;
+  }
+}
+
+/* Cross-blur when the panel body swaps between apps (keyed remount). */
+.t-panel-body {
+  animation: panel-body-in 200ms var(--ease-out);
+}
+@keyframes panel-body-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0);
+  }
+}
+
+/* Rail B drill-in (adapted transitions.dev #08 page side-by-side): the panel
+   re-enters from the side it came from when switching workspace ⇄ project.
+   Small distance on purpose — nav is used tens of times a day. */
+.t-railb-ctx[data-dir="forward"] {
+  animation: railb-in-forward 180ms var(--ease-out);
+}
+.t-railb-ctx[data-dir="back"] {
+  animation: railb-in-back 180ms var(--ease-out);
+}
+@keyframes railb-in-forward {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+@keyframes railb-in-back {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+}
+@keyframes railb-in-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Content resize (transitions.dev #01): tween height when a collapsible block
+   (e.g. the "Show all" description) expands or collapses. */
+.t-resize {
+  transition: height var(--resize-dur) var(--resize-ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-resize {
+    transition: none !important;
+  }
+}
+
+/* Avatar group: distance-falloff "comb" lift on hover (transitions.dev #11).
+   translateY before scale so scale doesn't amplify the lift. The JS in
+   avatar-group.tsx sets --shift / --scale-active per item and swaps the
+   timing-function inline (clean ease-in up, bouncy spring back). */
+.t-avatar {
+  transform-origin: center bottom;
+  transform: translateY(var(--shift, 0px)) scale(var(--scale-active, 1));
+  transition: transform var(--avatar-dur) var(--avatar-ease-in);
+}
+/* Staggered blurred rise on mount; --i is set inline per avatar. */
+.t-avatar-reveal {
+  animation: avatar-reveal 360ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+@keyframes avatar-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.9);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Skeleton loader + reveal (transitions.dev #14) */
+.t-skel {
+  display: grid;
+}
+.t-skel-skeleton,
+.t-skel-content {
+  /* Stack both layers in one grid cell so the container sizes to the taller of
+     the two — i.e. the content once revealed. (Absolute positioning collapsed
+     the container to the skeleton's min-height, so revealed content overflowed
+     and the following section overlapped it.) */
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.t-skel-skeleton {
+  z-index: 1;
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    opacity var(--reveal-dur) var(--reveal-ease),
+    filter var(--reveal-dur) var(--reveal-ease);
+}
+.t-skel-content {
+  z-index: 2;
+  opacity: 0;
+  filter: blur(var(--reveal-blur));
+  transition:
+    opacity var(--reveal-dur) var(--reveal-ease),
+    filter var(--reveal-dur) var(--reveal-ease);
+}
+.t-skel.is-revealed .t-skel-skeleton {
+  opacity: 0;
+  filter: blur(var(--reveal-blur));
+}
+.t-skel.is-revealed .t-skel-content {
+  opacity: 1;
+  filter: blur(0);
+}
+.t-skel-skeleton.is-pulsing > * {
+  animation: t-skel-pulse var(--pulse-dur) ease-in-out var(--pulse-count);
+}
+@keyframes t-skel-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: var(--pulse-min);
+  }
+}
+
+/* Staggered document row entrance */
+.t-doc-row {
+  opacity: 0;
+  transform: translateY(var(--stagger-rise));
+  filter: blur(var(--stagger-blur));
+  animation: t-doc-row-in var(--stagger-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.t-doc-row:nth-child(1) {
+  animation-delay: calc(var(--stagger-offset) * 0);
+}
+.t-doc-row:nth-child(2) {
+  animation-delay: calc(var(--stagger-offset) * 1);
+}
+.t-doc-row:nth-child(3) {
+  animation-delay: calc(var(--stagger-offset) * 2);
+}
+.t-doc-row:nth-child(4) {
+  animation-delay: calc(var(--stagger-offset) * 3);
+}
+.t-doc-row:nth-child(5) {
+  animation-delay: calc(var(--stagger-offset) * 4);
+}
+@keyframes t-doc-row-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Sort levels entering the Display panel (transitions.dev #18, three rows max).
+   Short rise, no blur: the row carries a native <select> whose text blurring
+   in reads as a rendering glitch rather than as motion. */
+.t-sort-level {
+  animation: t-sort-level-in 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.t-sort-level:nth-child(2) {
+  animation-delay: var(--stagger-offset);
+}
+.t-sort-level:nth-child(3) {
+  animation-delay: calc(var(--stagger-offset) * 2);
+}
+@keyframes t-sort-level-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-sort-level {
+    animation: none !important;
+  }
+}
+
+/* Sub-work item rows revealed by expanding a parent in the work-item list
+   (transitions.dev #18, staggered).
+
+   Only opacity and transform animate. The revealed rows take their full height
+   the instant they mount, so the rows below them settle once and never move
+   again — animating height here would shift the whole list for the duration.
+   The short downward settle reads as the sub-items unfolding out from under
+   their parent.
+
+   150ms, not #18's 500ms: expanding a row is something you do tens of times
+   while scanning a list, and at that frequency a long reveal reads as lag.
+   The stagger stops after five rows for the same reason — a parent with twenty
+   children must not take a second to finish revealing them. */
+.t-issue-child-row {
+  animation: t-issue-child-row-in 150ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(min(var(--i, 0), 4) * var(--stagger-offset));
+}
+@keyframes t-issue-child-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-issue-child-row {
+    animation: none !important;
+  }
+}
+
+/* Ancestor guides for nested work-item rows.
+   One 1px rule per level of depth, drawn across the row's indent zone, so a
+   child can be traced straight up to its parent instead of being read off a
+   24px offset. One pseudo-element repeats the line rather than one span per
+   level, so depth costs nothing in the DOM.
+   `--depth` and `--gn-indent-step` come from the row; the step lives in TS
+   (`INDENT_STEP`) and is passed in, never restated here, or the guides drift
+   out of line with the padding they are meant to describe.
+   Each row paints its own segment; rows are adjacent, so the segments stack
+   and read as continuous lines, interrupted only by the 1px row border. */
+.gn-row-guides::before {
+  content: "";
+  position: absolute;
+  left: 16px; /* the row's base padding, before the indent */
+  top: 0;
+  bottom: 0;
+  width: calc(var(--depth, 0) * var(--gn-indent-step, 24px));
+  background-image: linear-gradient(to right, var(--border) 0 1px, transparent 1px);
+  background-size: var(--gn-indent-step, 24px) 100%;
+  /* Must never intercept the full-row link that covers the row. */
+  pointer-events: none;
+}
+
+/* Developer-token create dialog: phase swap (name form <-> one-time reveal).
+   Blur-masked fade-in on the incoming phase so the two states crossfade
+   instead of hard-cutting when `created` flips (emil: blur bridges the two
+   overlapping states). Kept under 300ms so the reveal still feels instant. */
+.t-token-phase {
+  animation: t-token-phase-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes t-token-phase-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-token-phase {
+    animation: none;
+  }
+}
+
+/* Attachment viewer preview — subtle content reveal (transitions.dev skeleton pattern) */
+.t-attachment-preview {
+  opacity: 0;
+  filter: blur(2px);
+  animation: t-attachment-preview-in 250ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes t-attachment-preview-in {
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Repository file preview — same cross-blur on file switch (transitions.dev #14 feel) */
+.t-repo-preview {
+  opacity: 0;
+  filter: blur(2px);
+  animation: t-repo-preview-in 250ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes t-repo-preview-in {
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-repo-preview {
+    animation: none;
+    opacity: 1;
+    filter: none;
+  }
+}
+
+/* Repository Shiki preview — github-light/dark via light-dark() + line numbers */
+.repo-shiki pre.shiki {
+  margin: 0;
+  padding: 1rem 0;
+  background: transparent !important;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.75rem;
+  line-height: 1.625;
+  overflow-x: auto;
+}
+.repo-shiki pre.shiki code {
+  display: block;
+  counter-reset: line;
+}
+.repo-shiki pre.shiki .line {
+  display: block;
+  position: relative;
+  padding-left: 3.25rem;
+  min-height: 1.625em;
+}
+.repo-shiki pre.shiki .line::before {
+  counter-increment: line;
+  content: counter(line);
+  position: absolute;
+  left: 0;
+  width: 2.75rem;
+  padding-right: 0.75rem;
+  text-align: right;
+  color: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
+  user-select: none;
+  border-right: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+}
+
+/* Staggered text reveal (transitions.dev #18) — separate from row keyframes */
+.t-texts-line {
+  display: block;
+  opacity: 0;
+  transform: translateY(var(--stagger-distance, 12px));
+  filter: blur(var(--stagger-blur));
+  transition:
+    opacity var(--stagger-dur) var(--stagger-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    transform var(--stagger-dur) var(--stagger-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    filter var(--stagger-dur) var(--stagger-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+.t-texts-line--2 {
+  transition-delay: var(--stagger-stagger, 40ms);
+}
+.t-texts.is-shown .t-texts-line {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+.t-texts.is-hiding .t-texts-line {
+  opacity: 0;
+  transform: translateY(0);
+  filter: blur(0);
+  transition:
+    opacity 200ms ease,
+    transform 0s linear,
+    filter 0s linear;
+  transition-delay: 0s;
+}
+
+/* Keyframed stagger lines (home greeting, onboarding, etc.) */
+.t-stagger-line {
+  opacity: 0;
+  transform: translateY(var(--stagger-rise));
+  filter: blur(var(--stagger-blur));
+  animation: t-stagger-in var(--stagger-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.t-stagger-line:nth-child(1) {
+  animation-delay: calc(var(--stagger-offset) * 0);
+}
+.t-stagger-line:nth-child(2) {
+  animation-delay: calc(var(--stagger-offset) * 1);
+}
+.t-stagger-line:nth-child(3) {
+  animation-delay: calc(var(--stagger-offset) * 2);
+}
+.t-stagger-line:nth-child(4) {
+  animation-delay: calc(var(--stagger-offset) * 3);
+}
+.t-stagger-line:nth-child(5) {
+  animation-delay: calc(var(--stagger-offset) * 4);
+}
+@keyframes t-stagger-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Workspace-home cards: `--i`-indexed staggered rise (transitions.dev #18)
+   + a restrained hover lift/press for the launchpad grids. */
+.t-home-rise {
+  opacity: 0;
+  transform: translateY(var(--stagger-rise));
+  filter: blur(var(--stagger-blur));
+  animation: t-home-rise-in var(--stagger-dur) var(--ease-out) both;
+  animation-delay: calc(var(--stagger-offset) * var(--i, 0));
+}
+@keyframes t-home-rise-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+.t-card-lift {
+  transition:
+    transform 200ms var(--ease-out),
+    border-color 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .t-card-lift:hover {
+    transform: translateY(-2px);
+    border-color: var(--ring);
+    box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.18);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-home-rise {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  .t-card-lift,
+  .t-card-lift:hover {
+    transform: none;
+    transition: border-color 200ms var(--ease-out);
+  }
+}
+
+/* Sticky notes: staggered paper mount (transitions.dev #18) + hover lift/straighten (#11 feel) */
+.t-sticky {
+  opacity: 0;
+  transform: translateY(var(--stagger-rise));
+  filter: blur(var(--stagger-blur));
+  animation: t-sticky-in var(--stagger-dur) var(--ease-out) both;
+  animation-delay: calc(var(--stagger-offset) * var(--i, 0));
+}
+@keyframes t-sticky-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+.t-sticky-card {
+  transform: rotate(var(--rot, 0deg));
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.06),
+    0 6px 16px -8px rgb(0 0 0 / 0.14);
+  transition:
+    transform 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .t-sticky-card:hover {
+    transform: rotate(0deg) translateY(-4px) scale(1.015);
+    box-shadow:
+      0 2px 4px rgb(0 0 0 / 0.08),
+      0 16px 30px -12px rgb(0 0 0 / 0.24);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-sticky {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  .t-sticky-card,
+  .t-sticky-card:hover {
+    transform: none;
+  }
+}
+
+/* Project tab sliding underline (transitions.dev #16 adapted) */
+.t-project-tab-pill,
+.t-issues-pill {
+  transition:
+    transform var(--tabs-dur) var(--tabs-ease),
+    width var(--tabs-dur) var(--tabs-ease);
+  will-change: transform, width;
+}
+
+/* Inbox detail — content re-enter on selection change (GIN-270, email master-detail).
+   Keyed remount plays the @starting-style entry: quiet rise + cross-blur. */
+.t-detail-swap {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+  transition:
+    opacity 250ms var(--ease-out),
+    transform 250ms var(--ease-out),
+    filter 250ms var(--ease-out);
+}
+@starting-style {
+  .t-detail-swap {
+    opacity: 0;
+    transform: translateY(6px);
+    filter: blur(3px);
+  }
+}
+
+/* Inbox detail — mobile slide-over (list ↔ detail, transitions.dev #08 adapted). */
+.t-detail-slide {
+  transform: translateX(100%);
+  transition: transform 300ms var(--ease-drawer);
+  will-change: transform;
+}
+.t-detail-slide[data-open="true"] {
+  transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-detail-swap {
+    transition: opacity 150ms ease;
+    transform: none;
+    filter: none;
+  }
+  @starting-style {
+    .t-detail-swap {
+      transform: none;
+      filter: none;
+    }
+  }
+  .t-detail-slide {
+    transition: none;
+  }
+}
+
+/* View cross-fade when switching Work Item layouts (list ↔ kanban ↔ …).
+   Opacity + slight rise only — no filter, and no fill-mode that leaves a
+   lingering transform (that becomes a containing block for abspos children). */
+.t-view-swap {
+  animation: t-view-in 220ms var(--ease-out);
+}
+@keyframes t-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-view-swap {
+    animation: none;
+  }
+}
+
+/* Form error shake (transitions.dev #12) */
+.t-error.is-shaking {
+  animation:
+    t-error-msg-in 150ms var(--ease-out),
+    t-error-shake calc(var(--error-shake-dur) * 4) ease-in-out;
+}
+@keyframes t-error-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+@keyframes t-error-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-card,
+  .workspace-panel-cell,
+  .app-rail,
+  .panel-scrim {
+    transition: none !important;
+  }
+  .panel-scrim,
+  .workspace-card > .ai-pane {
+    animation: none !important;
+  }
+  .t-panel-body {
+    animation: none;
+  }
+  .t-railb-ctx[data-dir] {
+    animation: railb-in-fade 180ms ease;
+  }
+  .t-avatar {
+    transition: none !important;
+    transform: none !important;
+  }
+  .t-avatar-reveal {
+    animation: none;
+  }
+  .t-skel-skeleton,
+  .t-skel-content {
+    transition: none !important;
+  }
+  .t-skel-skeleton.is-pulsing > * {
+    animation: none !important;
+  }
+  .t-stagger-line,
+  .t-doc-row {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  .t-attachment-preview {
+    animation: none !important;
+    opacity: 1;
+    filter: none;
+  }
+  .t-texts-line {
+    transition: none !important;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  .t-project-tab-pill {
+    transition: none !important;
+  }
+  .t-error.is-shaking {
+    animation: none !important;
+  }
+}
+/* transitions.dev #10 — success check (marketplace onboarding done step) */
+:root {
+  --check-opacity-dur: 500ms;
+  --check-rotate-dur: 500ms;
+  --check-rotate-from: 80deg;
+  --check-bob-dur: 500ms;
+  --check-y-amount: 40px;
+  --check-blur-dur: 500ms;
+  --check-blur-from: 10px;
+  --check-path-dur: 500ms;
+  --check-path-delay: 80ms;
+  --check-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-ease-bob: cubic-bezier(0.34, 1.35, 0.64, 1);
+}
+
+.t-success-check {
+  display: inline-block;
+  transform-origin: center;
+  opacity: 0;
+  will-change: transform, opacity, filter;
+}
+.t-success-check svg { display: block; overflow: visible; }
+/* dasharray = getTotalLength() of the M14 25 L21 32 L34 17 check path (~29.75), rounded up */
+.t-success-check svg path {
+  stroke-dasharray: 31;
+  stroke-dashoffset: 31;
+}
+
+.t-success-check[data-state="in"] {
+  animation:
+    t-check-fade   var(--check-opacity-dur) var(--check-ease-out) forwards,
+    t-check-rotate var(--check-rotate-dur)  var(--check-ease-out) forwards,
+    t-check-blur   var(--check-blur-dur)    var(--check-ease-out) forwards,
+    t-check-bob    var(--check-bob-dur)     var(--check-ease-bob) forwards;
+}
+.t-success-check[data-state="in"] svg path {
+  animation: t-check-draw var(--check-path-dur) var(--check-ease-out) var(--check-path-delay, 0ms) forwards;
+}
+
+@keyframes t-check-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes t-check-rotate {
+  from { transform: rotate(var(--check-rotate-from)); }
+  to   { transform: rotate(0deg); }
+}
+@keyframes t-check-blur {
+  from { filter: blur(var(--check-blur-from)); }
+  to   { filter: blur(0); }
+}
+@keyframes t-check-bob {
+  from { translate: 0 var(--check-y-amount); }
+  to   { translate: 0 0; }
+}
+@keyframes t-check-draw { to { stroke-dashoffset: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .t-success-check { animation: none !important; opacity: 1; }
+  .t-success-check svg path { animation: none !important; stroke-dashoffset: 0 !important; }
+}
+
+/* transitions.dev #09 — icon swap (marketplace profile share dialog's
+   "Copy" -> "Copied!" button; reused for the whole icon+label content). */
+:root {
+  --icon-swap-dur: 250ms;
+  --icon-swap-blur: 2px;
+  --icon-swap-start-scale: 0.25;
+  --icon-swap-ease: ease-in-out;
+}
+
+.t-icon-swap {
+  position: relative;
+  display: inline-grid;
+}
+.t-icon-swap .t-icon {
+  grid-area: 1 / 1;
+  transition:
+    opacity   var(--icon-swap-dur) var(--icon-swap-ease),
+    filter    var(--icon-swap-dur) var(--icon-swap-ease),
+    transform var(--icon-swap-dur) var(--icon-swap-ease);
+  will-change: opacity, filter, transform;
+}
+.t-icon-swap[data-state="a"] .t-icon[data-icon="a"],
+.t-icon-swap[data-state="b"] .t-icon[data-icon="b"] {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+.t-icon-swap[data-state="a"] .t-icon[data-icon="b"],
+.t-icon-swap[data-state="b"] .t-icon[data-icon="a"] {
+  opacity: 0;
+  filter: blur(var(--icon-swap-blur));
+  transform: scale(var(--icon-swap-start-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-icon-swap .t-icon { transition: none !important; }
+}
+
+/* GigsAI shimmer text — transitions.dev #15, theme-aware, reduced-motion guarded.
+   Base/highlight reference shadcn tokens so they flip with light/dark automatically. */
+:root {
+  --shimmer-dur: 2600ms;
+  --shimmer-band: 400%;
+  --shimmer-ease: linear;
+  --shimmer-base: var(--muted-foreground);
+  --shimmer-highlight: var(--primary);
+}
+.t-shimmer {
+  position: relative;
+  display: inline-block;
+  color: var(--shimmer-base);
+}
+.t-shimmer::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 40%,
+    var(--shimmer-highlight) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: var(--shimmer-band) 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: t-shimmer var(--shimmer-dur) var(--shimmer-ease) infinite;
+}
+@keyframes t-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-shimmer::before { animation: none !important; }
+}
+
+/* AI-agent avatar: sparkle-badge mount pop (transitions-dev). */
+@keyframes agent-badge-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.12); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.t-agent-badge {
+  /* Bouncy-overshoot "badge pop" token; scale starts visible (never from 0). */
+  animation: agent-badge-pop 260ms cubic-bezier(0.34, 1.36, 0.64, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-agent-badge { animation: none; }
+}
+
+/* Page side-by-side — transitions.dev #08 (detail ↔ assistant ↔ doc in peek). */
+:root {
+  --page-slide-dur: 250ms;
+  --page-fade-dur: 250ms;
+  --page-slide-distance: 8px;
+  --page-blur: 3px;
+  --page-stagger: 0ms;
+  --page-exit-enabled: 1;
+  --page-slide-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --page-fade-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.t-page-slide {
+  position: relative;
+}
+.t-page-slide .t-page[data-page-id="1"] {
+  --t-page-from-x: calc(var(--page-slide-distance) * -1);
+}
+.t-page-slide .t-page[data-page-id="2"] {
+  --t-page-from-x: var(--page-slide-distance);
+}
+.t-page-slide .t-page[data-page-id="3"] {
+  --t-page-from-x: var(--page-slide-distance);
+}
+.t-page-slide .t-page {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(calc(var(--t-page-from-x, 0px) * var(--page-exit-enabled)));
+  filter: blur(calc(var(--page-blur) * var(--page-exit-enabled)));
+  transition:
+    opacity var(--page-fade-dur) var(--page-fade-ease),
+    transform var(--page-slide-dur) var(--page-slide-ease),
+    filter var(--page-slide-dur) var(--page-slide-ease);
+  will-change: opacity, transform, filter;
+}
+.t-page-slide[data-page="1"] .t-page[data-page-id="1"],
+.t-page-slide[data-page="2"] .t-page[data-page-id="2"],
+.t-page-slide[data-page="3"] .t-page[data-page-id="3"] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+  filter: blur(0);
+  transition-delay: var(--page-stagger);
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-page-slide .t-page {
+    transition: opacity 150ms ease;
+    filter: none !important;
+    transform: none !important;
+  }
+}
+
+/* Issue detail prev/next — press feedback only (transitions-dev + emil-design-eng).
+   Content swaps instantly; no slide/fade on item change (high-frequency action). */
+:root {
+  --issue-nav-press-dur: 160ms;
+  --issue-nav-press-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --issue-nav-hover-dur: 150ms;
+}
+.t-issue-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 2px;
+  border-radius: calc(var(--radius) + 2px);
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--muted) 45%, transparent);
+}
+.t-issue-nav-count {
+  min-width: 2.75rem;
+  padding: 0 6px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: var(--muted-foreground);
+  user-select: none;
+}
+.t-issue-nav-btn {
+  display: inline-flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--radius));
+  color: var(--muted-foreground);
+  transition:
+    transform var(--issue-nav-press-dur) var(--issue-nav-press-ease),
+    background-color var(--issue-nav-hover-dur) ease-out,
+    color var(--issue-nav-hover-dur) ease-out;
+  outline: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .t-issue-nav-btn:not([aria-disabled="true"]):hover {
+    background-color: var(--muted);
+    color: var(--foreground);
+  }
+}
+.t-issue-nav-btn:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+}
+.t-issue-nav-btn:active:not([aria-disabled="true"]) {
+  transform: scale(0.97);
+}
+.t-issue-nav-btn[aria-disabled="true"] {
+  opacity: 0.35;
+  cursor: default;
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-issue-nav-btn {
+    transition: background-color var(--issue-nav-hover-dur) ease-out, color var(--issue-nav-hover-dur) ease-out;
+  }
+  .t-issue-nav-btn:active:not([aria-disabled="true"]) {
+    transform: none;
+  }
+}
+
+/* Issue detail — Plane-style two-column shell (main scroll + properties rail). */
+.issue-detail-root {
+  --issue-detail-sidebar-w: 20rem;
+}
+@media (min-width: 80rem) {
+  .issue-detail-root {
+    --issue-detail-sidebar-w: 24rem;
+  }
+}
+.issue-detail-main {
+  scroll-behavior: auto;
+}
+
+/* Agent delegation — panel reveal + fast spinner (transitions.dev #07 + emil perf). */
+.t-delegation-card {
+  animation: panel-body-in 200ms var(--ease-out);
+}
+.t-delegation-card--enter {
+  animation: panel-body-in 200ms var(--ease-out);
+}
+.t-delegation-spin {
+  animation: t-delegation-spin 600ms linear infinite;
+}
+@keyframes t-delegation-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-delegation-card,
+  .t-delegation-card--enter {
+    animation: none;
+  }
+  .t-delegation-spin {
+    animation: none;
+  }
+}
+
+/* transitions.dev #05 — origin-aware dropdown (slash command menu) */
+.t-dropdown {
+  transform-origin: bottom left;
+  transform: scale(var(--dropdown-pre-scale));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--dropdown-open-dur) var(--dropdown-ease),
+    opacity var(--dropdown-open-dur) var(--dropdown-ease);
+  will-change: transform, opacity;
+}
+.t-dropdown[data-origin="bottom-left"] {
+  transform-origin: bottom left;
+}
+.t-dropdown[data-origin="bottom-center"] {
+  transform-origin: bottom center;
+}
+.t-dropdown.is-open {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+.t-dropdown.is-closing {
+  transform: scale(var(--dropdown-closing-scale));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--dropdown-close-dur) var(--dropdown-ease),
+    opacity var(--dropdown-close-dur) var(--dropdown-ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-dropdown {
+    transition: none !important;
+  }
+}
+
+/* Chat markdown typography is owned by the streamdown `components` map in
+   src/components/ai/chat/chat-markdown-components.tsx (chat-scale renderers),
+   not element CSS here — keeps it out of a specificity fight with streamdown's
+   baked utilities. */
+
+/* ── Marketing landing motion (GIN-27) ───────────────────────────── */
+@keyframes gn-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes gn-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes gn-typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+@keyframes gn-trail {
+  0% { transform: translateX(-10%); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateX(115%); opacity: 0; }
+}
+@keyframes gn-fade-up {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+/* Codebase Overview dashboard cards: staggered rise on mount (GIN-271). --i set inline. */
+.gn-dash-card { animation: gn-fade-up 0.5s var(--ease-out, ease-out) both; animation-delay: calc(var(--i, 0) * 55ms); }
+@media (prefers-reduced-motion: reduce) { .gn-dash-card { animation: none !important; } }
+.gn-float { animation: gn-float 6s ease-in-out infinite; }
+.gn-marquee { animation: gn-marquee 34s linear infinite; }
+.gn-marquee:hover { animation-play-state: paused; }
+.gn-typing-dot { animation: gn-typing 1.2s ease-in-out infinite; }
+.gn-trail { animation: gn-trail 3.4s ease-in-out infinite; }
+.gn-fade-up { animation: gn-fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .gn-float, .gn-marquee, .gn-typing-dot, .gn-trail, .gn-fade-up {
+    animation: none !important;
+  }
+}
+/* ── Voice (GIN-493) ─────────────────────────────────────────────────────────
+   Only transform and opacity animate here — the level meter updates every
+   animation frame while the mic is open, so anything that triggers layout would
+   be paid ~60x a second for the whole session. */
+
+.gn-voice-entry {
+  transition: transform 160ms var(--ease-out, ease-out);
+}
+.gn-voice-entry:active {
+  transform: scale(0.97);
+}
+
+/* scaleX rather than width: same visual, no layout on every frame. */
+.gn-voice-level {
+  transform-origin: left center;
+  transition: transform 90ms linear;
+}
+
+/* The live indicator. A slow pulse reads as "on" without pulling the eye away
+   from the caption, which is the thing the user is actually reading. */
+.gn-voice-dot {
+  opacity: 0.45;
+}
+.gn-voice-dot.is-live {
+  animation: gn-voice-pulse 1.6s ease-in-out infinite;
+}
+@keyframes gn-voice-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.35); }
+}
+
+.gn-voice-ptt {
+  transition: transform 160ms var(--ease-out, ease-out);
+}
+.gn-voice-ptt:active,
+.gn-voice-ptt[aria-pressed="true"] {
+  transform: scale(0.97);
+}
+
+/* Cards arrive as the conversation moves, so this is a transition-free entry
+   via @starting-style rather than a keyframe: a card added while another is
+   still animating retargets instead of restarting. */
+.gn-voice-card {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 200ms var(--ease-out, ease-out),
+    transform 200ms var(--ease-out, ease-out);
+}
+@starting-style {
+  .gn-voice-card {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.gn-voice-choice,
+.gn-voice-chip {
+  transition:
+    background-color 150ms ease-out,
+    border-color 150ms ease-out,
+    transform 160ms var(--ease-out, ease-out);
+}
+.gn-voice-choice:active,
+.gn-voice-chip:active {
+  transform: scale(0.98);
+}
+
+/* Reduced motion keeps opacity (it aids comprehension) and drops movement. */
+@media (prefers-reduced-motion: reduce) {
+  .gn-voice-dot.is-live {
+    animation: none;
+    opacity: 1;
+  }
+  .gn-voice-entry:active,
+  .gn-voice-ptt:active,
+  .gn-voice-ptt[aria-pressed="true"],
+  .gn-voice-choice:active,
+  .gn-voice-chip:active {
+    transform: none;
+  }
+  .gn-voice-card {
+    transition: opacity 200ms ease-out;
+  }
+  @starting-style {
+    .gn-voice-card {
+      transform: none;
+    }
+  }
+}
+
+/* ── Meeting notetaker (F3 live page) ────────────────────────────────── */
+
+/* Each speaker group fades + rises 6px on arrival. `@starting-style` fires on
+   every fresh mount, which is exactly right here: `groupBySpeaker` gives a new
+   key to any group that starts a new speaker turn, so only genuinely new rows
+   play the entrance — a group that just grew another line in place doesn't. */
+.gn-meeting-group {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 180ms var(--ease-out, ease-out),
+    transform 180ms var(--ease-out, ease-out);
+}
+@starting-style {
+  .gn-meeting-group {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* "Jump to live" pill — quiet pop-in, never from scale(0). */
+.gn-meeting-jump-pill {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+  transition:
+    opacity 150ms var(--ease-out, ease-out),
+    transform 150ms var(--ease-out, ease-out);
+}
+@starting-style {
+  .gn-meeting-jump-pill {
+    opacity: 0;
+    transform: translate(-50%, 4px) scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gn-meeting-group {
+    transition: opacity 150ms ease;
+    transform: none;
+  }
+  @starting-style {
+    .gn-meeting-group {
+      transform: none;
+    }
+  }
+  .gn-meeting-jump-pill {
+    transition: opacity 150ms ease;
+    transform: translate(-50%, 0) scale(1);
+  }
+  @starting-style {
+    .gn-meeting-jump-pill {
+      transform: translate(-50%, 0) scale(1);
+    }
+  }
+}

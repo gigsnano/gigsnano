@@ -1,0 +1,76 @@
+# GigsNano self-host stack: Postgres + API + web, keyless by default.
+#   docker compose up --build        -> http://localhost:3000
+# Override any variable in a root .env file (see .env.example). Real providers
+# (Anthropic, Google, GitHub, email, Stripe) are configured in apps/api/.env.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: gigsnano
+      POSTGRES_PASSWORD: gigsnano
+      POSTGRES_DB: gigsnano
+    ports:
+      # Loopback only: the database is never reachable from other machines.
+      # Host 5433 avoids clashing with a system Postgres on 5432.
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gigsnano -d gigsnano"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: apps/api
+    env_file:
+      - path: apps/api/.env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gigsnano:gigsnano@db:5432/gigsnano
+      WORKSPACE_BASE_PATH: /workspaces
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      CORS_ORIGINS: '["${WEB_ORIGIN:-http://localhost:3000}"]'
+      FRONTEND_URL: ${WEB_ORIGIN:-http://localhost:3000}
+      APP_BASE_URL: ${WEB_ORIGIN:-http://localhost:3000}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      BILLING_ENABLED: ${BILLING_ENABLED:-false}
+    ports:
+      # Loopback only (for local debugging); browsers reach the API through the
+      # web app's /api proxy. Exposing it directly would let clients spoof
+      # X-Forwarded-For past the per-IP rate limit.
+      - "127.0.0.1:8020:8000"
+    volumes:
+      - project_workspaces:/workspaces
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        # The browser talks to the web origin; Next proxies /api, /mcp and /oauth
+        # to the API container, so session cookies stay first-party.
+        NEXT_PUBLIC_API_BASE_URL: /api
+        NEXT_PUBLIC_USE_MOCKS: "false"
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+        API_PROXY_TARGET: http://api:8000/api
+    environment:
+      API_PROXY_TARGET: http://api:8000/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  project_workspaces:

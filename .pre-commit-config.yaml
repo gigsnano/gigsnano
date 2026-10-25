@@ -1,0 +1,20 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.12
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^apps/api/
+      - id: ruff-format
+        files: ^apps/api/
+
+  - repo: local
+    hooks:
+      # python-doctor over the staged lines only, so it flags what you are about to
+      # commit and never the repo's pre-existing findings.
+      - id: python-doctor
+        name: python-doctor (staged)
+        entry: bash -c 'cd apps/api && uv run python scripts/python_doctor.py --scope staged'
+        language: system
+        pass_filenames: false
+        files: ^apps/api/.*\.py$

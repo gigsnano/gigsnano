@@ -1,0 +1,28 @@
+export {
+  applyStatus,
+  assertSameWorkspace,
+  assertTransition,
+  beginDelete,
+  canUseConnection,
+  finishDelete,
+  recoveryInstructions,
+  revokeConnection,
+  sanitizeConnectionForClient,
+  validateCallbackState,
+} from "./lifecycle";
+export {
+  auditTimeline,
+  buildDependencyGraph,
+  degradedNotice,
+  evaluateHealth,
+  expiringSubscriptions,
+  healthAlerts,
+  isUsableFromCachedSession,
+  nextRetryAt,
+  previewUninstall,
+  recordPermissionIncrease,
+  REPEATED_FAILURE_THRESHOLD,
+  SUBSCRIPTION_WARNING_MS,
+  summarizeUninstall,
+  type IHealthCheckInput,
+} from "./operations";

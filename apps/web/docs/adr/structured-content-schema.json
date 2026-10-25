@@ -1,0 +1,263 @@
+{
+  "$comment": "Normative node/mark registry for ADR 0001 (GIN-298). Single source for the TipTap extension set, the JSON validator allow-list, the Markdown parser/serializer tables and the HTML renderer. status=live ships today; status=planned is new scope inside GIN-297. Fixtures: apps/api/tests/fixtures/content/",
+  "schema": "gigsnano.doc",
+  "schemaVersion": 1,
+  "envelope": {
+    "schema": { "type": "string", "const": "gigsnano.doc" },
+    "version": { "type": "integer", "description": "bumped only on breaking change; see ADR 0001 section 7" },
+    "doc": { "type": "object", "description": "plain ProseMirror doc node" },
+    "provenance": {
+      "source": ["editor", "markdown", "html-backfill", "agent", "import"],
+      "migrated_from": ["html", "markdown"],
+      "migrated_at": "ISO-8601, optional",
+      "migrator": "string, optional, e.g. gin-308@1"
+    }
+  },
+  "uriScheme": {
+    "prefix": "gigsnano:",
+    "forms": ["gigsnano:user/<uuid>", "gigsnano:team/<uuid>", "gigsnano:work-item/<uuid>", "gigsnano:file/<uuid>"]
+  },
+  "allowedLinkSchemes": ["http", "https", "mailto", "gigsnano"],
+
+  "nodes": {
+    "doc": {
+      "status": "live",
+      "kind": "root",
+      "content": "block+",
+      "tiptap": "@tiptap/starter-kit (Document)",
+      "html": null,
+      "markdown": "document root"
+    },
+    "paragraph": {
+      "status": "live",
+      "kind": "block",
+      "attrs": { "textAlign": { "default": null, "values": ["left", "center", "right"], "identity": false } },
+      "tiptap": "@tiptap/starter-kit (Paragraph) + @tiptap/extension-text-align",
+      "html": "<p>",
+      "markdown": "blank-line-separated block. textAlign has NO markdown representation and is dropped on markdown export (documented lossy attr)."
+    },
+    "heading": {
+      "status": "live",
+      "kind": "block",
+      "attrs": {
+        "level": { "values": [1, 2, 3], "identity": false, "note": "editor exposes 1-3 only (rich-editor.tsx:95); parser accepts 1-6 and clamps" },
+        "textAlign": { "default": null, "identity": false }
+      },
+      "tiptap": "@tiptap/starter-kit (Heading)",
+      "html": "<h1>-<h3>",
+      "markdown": "ATX `#`..`######`"
+    },
+    "text": {
+      "status": "live",
+      "kind": "inline",
+      "tiptap": "@tiptap/starter-kit (Text)",
+      "html": "text node",
+      "markdown": "literal text; markdown special chars escaped on export"
+    },
+    "hardBreak": {
+      "status": "live",
+      "kind": "inline",
+      "tiptap": "@tiptap/starter-kit (HardBreak)",
+      "html": "<br>",
+      "markdown": "backslash at end of line"
+    },
+    "codeBlock": {
+      "status": "live",
+      "kind": "block",
+      "attrs": { "language": { "default": null, "identity": false, "note": "language=\"mermaid\" is the mermaid source block; SVG is NEVER stored" } },
+      "tiptap": "MermaidCodeBlock = CodeBlock.extend (src/components/editor/extensions/mermaid-code-block.tsx:83)",
+      "html": "<pre><code class=\"language-*\">",
+      "markdown": "fenced ``` with info string"
+    },
+    "blockquote": {
+      "status": "live",
+      "kind": "block",
+      "content": "block+",
+      "tiptap": "@tiptap/starter-kit (Blockquote)",
+      "html": "<blockquote>",
+      "markdown": "`> ` prefix"
+    },
+    "bulletList": {
+      "status": "live",
+      "kind": "block",
+      "content": "listItem+",
+      "tiptap": "@tiptap/starter-kit (BulletList)",
+      "html": "<ul>",
+      "markdown": "`- `"
+    },
+    "orderedList": {
+      "status": "live",
+      "kind": "block",
+      "content": "listItem+",
+      "attrs": { "start": { "default": 1, "identity": false } },
+      "tiptap": "@tiptap/starter-kit (OrderedList)",
+      "html": "<ol>",
+      "markdown": "`1. `"
+    },
+    "listItem": {
+      "status": "live",
+      "kind": "block",
+      "tiptap": "@tiptap/starter-kit (ListItem)",
+      "html": "<li>",
+      "markdown": "list item body, nested by indentation"
+    },
+    "taskList": {
+      "status": "live",
+      "kind": "block",
+      "content": "taskItem+",
+      "tiptap": "@tiptap/extension-task-list",
+      "html": "<ul data-type=\"taskList\">",
+      "markdown": "GFM task list"
+    },
+    "taskItem": {
+      "status": "live",
+      "kind": "block",
+      "attrs": { "checked": { "default": false, "identity": false, "note": "GIN-78: checked state must persist through every round trip" } },
+      "tiptap": "@tiptap/extension-task-item { nested: true }",
+      "html": "<li data-checked=\"true|false\">",
+      "markdown": "`- [ ] ` / `- [x] `"
+    },
+    "horizontalRule": {
+      "status": "live",
+      "kind": "block",
+      "tiptap": "@tiptap/starter-kit (HorizontalRule) — variant=full only",
+      "html": "<hr>",
+      "markdown": "`---`"
+    },
+    "image": {
+      "status": "live",
+      "kind": "block",
+      "attrs": {
+        "fileId": { "identity": true, "nullable": true, "note": "null for external images" },
+        "src": { "identity": false, "note": "fallback / external URL" },
+        "alt": { "identity": false },
+        "title": { "identity": false }
+      },
+      "tiptap": "createImagePaste() = Image.extend (src/components/editor/extensions/image-paste.ts:51)",
+      "html": "<img>",
+      "markdown": "`![alt](gigsnano:file/<uuid>)` when internal, `![alt](url)` otherwise"
+    },
+    "mention": {
+      "status": "live",
+      "kind": "inline",
+      "atom": true,
+      "attrs": {
+        "entityId": { "identity": true, "note": "maps to the existing entity_identifier attr" },
+        "entityType": { "values": ["user", "team"], "identity": false, "note": "maps to entity_name" },
+        "label": { "identity": false, "note": "display fallback captured at insert time" }
+      },
+      "tiptap": "UserMentionExtension = Mention.extend (src/components/editor/extensions/mention/mention-extension.ts:41)",
+      "html": "<mention-component id entity_identifier entity_name>",
+      "markdown": "`[@Label](gigsnano:user/<uuid>)`",
+      "unresolved": "render label in unresolved state; JSON written back unchanged"
+    },
+    "workItemRef": {
+      "status": "live",
+      "kind": "inline",
+      "atom": true,
+      "attrs": {
+        "workItemId": { "identity": true },
+        "code": { "identity": false, "note": "e.g. GIN-297" },
+        "title": { "identity": false }
+      },
+      "tiptap": "extensions/work-item-ref — `#` suggestion picker (GIN-362)",
+      "html": "<work-item-ref>",
+      "markdown": "`[GIN-297](gigsnano:work-item/<uuid>)`",
+      "unresolved": "render code in unresolved state"
+    },
+    "attachment": {
+      "status": "live",
+      "kind": "block",
+      "atom": true,
+      "attrs": {
+        "fileId": { "identity": true },
+        "fileName": { "identity": false },
+        "mimeType": { "identity": false },
+        "size": { "identity": false }
+      },
+      "tiptap": "extensions/attachment — comment toolbar attach button (GIN-372)",
+      "html": "<attachment-ref>",
+      "markdown": "`[fileName](gigsnano:file/<uuid>)`",
+      "unresolved": "render fileName in unresolved state"
+    },
+    "table": {
+      "status": "planned",
+      "kind": "block",
+      "content": "tableRow+",
+      "tiptap": "@tiptap/extension-table — NOT INSTALLED. prosemirror-tables 1.8.5 is present transitively via @tiptap/pm.",
+      "html": "<table>",
+      "markdown": "GFM pipe table",
+      "note": "No editor table support exists today; renderSimpleMarkdown (src/lib/docs/markdown.ts:28) renders pipe tables on the document read path only."
+    },
+    "tableRow": { "status": "planned", "kind": "block", "content": "(tableCell|tableHeader)+", "html": "<tr>", "markdown": "table row" },
+    "tableCell": { "status": "planned", "kind": "block", "attrs": { "colspan": { "default": 1 }, "rowspan": { "default": 1 } }, "html": "<td>", "markdown": "cell; colspan/rowspan have no GFM representation and are dropped (documented lossy)" },
+    "tableHeader": { "status": "planned", "kind": "block", "html": "<th>", "markdown": "header row + delimiter row" },
+    "unknownBlock": {
+      "status": "planned",
+      "kind": "block",
+      "atom": true,
+      "attrs": {
+        "originalType": { "identity": true },
+        "raw": { "identity": true, "note": "preserved byte-for-byte on write; this is what makes additive schema changes non-breaking" }
+      },
+      "tiptap": "new node with a passive node view",
+      "html": "<div data-unknown-node>",
+      "markdown": "rendered as a fenced block with info string `gigsnano-unknown`"
+    }
+  },
+
+  "marks": {
+    "bold":      { "status": "live", "tiptap": "@tiptap/starter-kit (Bold)",      "html": "<strong>", "markdown": "`**`, or `__` when the preceding run ended with `*` (avoids fusing into an ambiguous `***` delimiter run)" },
+    "italic":    { "status": "live", "tiptap": "@tiptap/starter-kit (Italic)",    "html": "<em>",     "markdown": "`*`, or `_` at a `*` boundary. NOT `_` by default: CommonMark forbids `_` from opening or closing inside a word, so a mark starting mid-word would be silently dropped." },
+    "strike":    { "status": "live", "tiptap": "@tiptap/starter-kit (Strike)",    "html": "<s>",      "markdown": "`~~` (GFM). Serialized innermost, against the letters — `~~` needs a word character on the inside to bind." },
+    "underline": { "status": "live", "tiptap": "@tiptap/starter-kit (Underline)", "html": "<u>",      "markdown": "NO markdown representation — dropped on export (documented lossy mark)" },
+    "code":      { "status": "live", "tiptap": "@tiptap/starter-kit (Code)",      "html": "<code>",   "markdown": "backtick span" },
+    "link": {
+      "status": "live",
+      "tiptap": "@tiptap/starter-kit (Link) { openOnClick: false, autolink: true }",
+      "html": "<a href target rel>",
+      "markdown": "`[text](href)`",
+      "attrs": { "href": { "identity": true, "schemeChecked": true }, "target": { "identity": false }, "rel": { "identity": false } }
+    },
+    "unknownMark": {
+      "status": "planned",
+      "attrs": { "originalType": { "identity": true }, "raw": { "identity": true } },
+      "html": "<span data-unknown-mark>",
+      "markdown": "mark dropped, wrapped text preserved"
+    }
+  },
+
+  "lossyOnMarkdownExport": [
+    "paragraph.textAlign",
+    "heading.textAlign",
+    "underline mark",
+    "tableCell.colspan",
+    "tableCell.rowspan",
+    "a run carrying two or more marks immediately followed by a word character (`**~~old~~**new`) — whichever mark is outermost, its closing delimiter is preceded by punctuation and followed by a word character, which fails CommonMark's right-flanking rules. The text always survives; only the marks are dropped. Separated by a space, the same content round-trips exactly."
+  ],
+
+  "canonicalizations": {
+    "$comment": "Normalisations validate_doc applies so that two documents meaning the same thing compare equal — required for GIN-305 dual-write divergence detection.",
+    "mergeAdjacentText": "neighbouring text nodes with identical marks are joined, as ProseMirror does on every transaction",
+    "markOrder": "marks are sorted into registry declaration order",
+    "mergeAdjacentLists": "sibling lists of the same type fuse; Markdown cannot express two adjacent lists of one kind, and neither can the editor",
+    "splitMixedLists": "a GFM list holding both plain and task items parses back as consecutive bulletList/taskList runs",
+    "softBreaks": "a soft wrap is whitespace and rejoins the paragraph"
+  },
+
+  "maxNesting": {
+    "value": 100,
+    "$comment": "markdown-it's recursion guard. Its default of 20 loses content from merely deeply-indented real documents; 100 clears any hand-written document while still bounding the parse. A documented ceiling, not silent loss."
+  },
+
+  "unsupportedMarkdownConstructs": {
+    "policy": "parsed as literal text; never errors, never silently vanishes",
+    "constructs": ["raw HTML blocks and inline HTML", "footnotes", "definition lists", "directives", "math", "front matter"]
+  },
+
+  "notStored": {
+    "mermaidSvg": "rendered client-side at view time with securityLevel:'strict'; never persisted, never returned by an API. SVG upload is already blocked server-side (features/images/router.py:36-38).",
+    "derivedHtml": "generated from JSON; the legacy *_html column is a rollback surface, not a source of truth.",
+    "plainText": "derived projection for search (features/search/service.py:40)."
+  }
+}

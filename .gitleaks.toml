@@ -1,0 +1,8 @@
+# gitleaks config: default rules plus vetted false positives.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Public Figma Community file key recorded as the illustration source (not a credential)"
+paths = ['''apps/web/src/components/empty-state/assets/manifest\.json''']
+regexes = ['''EsLWGin19gXpenrhPKJ8qz''']
