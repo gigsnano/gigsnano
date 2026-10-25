@@ -15,7 +15,14 @@ from gigsnano_api.core.db import utcnow
 from gigsnano_api.features.meetings.service import _aware, list_segments
 from gigsnano_api.features.notifications.router import notify
 from gigsnano_api.features.voice.resolver import rank, resolve_date
-from gigsnano_api.models import EMemberStatus, ENotificationKind, ProjectMember, Workspace
+from gigsnano_api.llm.usage import UsageTally, record_tally
+from gigsnano_api.models import (
+    ELlmUsageSource,
+    EMemberStatus,
+    ENotificationKind,
+    ProjectMember,
+    Workspace,
+)
 from gigsnano_api.models.meetings import (
     ITEM_PENDING,
     NOTES_EMPTY,
@@ -69,11 +76,14 @@ def transcript_text(segments) -> str:
     return text[:MAX_TRANSCRIPT_CHARS]
 
 
-async def extract_notes(provider: LLMProvider, title: str, transcript: str) -> MeetingNotesDraft:
+async def extract_notes(provider: LLMProvider, title: str, transcript: str, *,
+                        tally: UsageTally | None = None) -> MeetingNotesDraft:
     messages = [{"role": "user", "content": f"Meeting: {title}\n\nTranscript:\n{transcript}"}]
     for _ in range(_MAX_ATTEMPTS):
         result = await provider.extract(system=_SYSTEM, messages=messages, tool_name=_TOOL,
                                         schema=MeetingNotesDraft.model_json_schema())
+        if tally is not None:
+            tally.add(result)
         try:
             return MeetingNotesDraft.model_validate(result.data)
         except ValidationError as err:
@@ -98,6 +108,20 @@ def _due(phrase: str | None, now: datetime) -> date | None:
     return date.fromisoformat(field.value) if field.state is EFieldState.RESOLVED and field.value else None
 
 
+async def _record_notes_usage(db: AsyncSession, meeting: Meeting, tally: UsageTally,
+                              provider: LLMProvider) -> None:
+    """Charged to whoever started the meeting bot. A meeting with no recorded
+    creator (legacy rows) has nobody to attribute the call to, so it is logged."""
+    if meeting.created_by_id is None:
+        if tally.calls:
+            logger.warning("meeting notes usage unattributed meeting=%s tokens=%d/%d",
+                           meeting.id, tally.input_tokens, tally.output_tokens)
+        return
+    await record_tally(db, tally, provider, workspace_id=meeting.workspace_id,
+                       user_id=meeting.created_by_id, source=ELlmUsageSource.MEETING_NOTES,
+                       project_id=meeting.project_id)
+
+
 async def generate_notes(db: AsyncSession, meeting: Meeting, provider: LLMProvider, *,
                          now: datetime | None = None) -> None:
     segments = await list_segments(db, meeting.id)
@@ -105,14 +129,18 @@ async def generate_notes(db: AsyncSession, meeting: Meeting, provider: LLMProvid
         meeting.notes_status = NOTES_EMPTY
         await db.flush()
         return
+    tally = UsageTally()
     try:
         draft = await asyncio.wait_for(
-            extract_notes(provider, meeting.title, transcript_text(segments)), timeout=_EXTRACTION_TIMEOUT)
+            extract_notes(provider, meeting.title, transcript_text(segments), tally=tally),
+            timeout=_EXTRACTION_TIMEOUT)
     except Exception:  # noqa: BLE001 — surfaced to the user as notes_status=failed
         logger.exception("meeting notes extraction failed meeting=%s", meeting.id)
+        await _record_notes_usage(db, meeting, tally, provider)
         meeting.notes_status = NOTES_FAILED
         await db.flush()
         return
+    await _record_notes_usage(db, meeting, tally, provider)
 
     meeting_id = meeting.id
     try:

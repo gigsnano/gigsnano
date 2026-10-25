@@ -22,6 +22,7 @@ from gigsnano_api.bmad.provider import LLMProvider
 from gigsnano_api.features.package_import.service import package_documents
 from gigsnano_api.lib.document_classify import DOC_TYPES, classify_document
 from gigsnano_api.lib.markdown_sections import split_sections
+from gigsnano_api.llm.usage import UsageTally
 from gigsnano_api.models.artifacts import Artifact
 from gigsnano_api.models.packages import (
     FINDING_KINDS,
@@ -78,7 +79,8 @@ def _clean(finding: _Finding) -> _Finding | None:
     return finding.model_copy(update={"status": status})
 
 
-async def _extract(provider: LLMProvider, prompt: str, schema_model, tool: str):
+async def _extract(provider: LLMProvider, prompt: str, schema_model, tool: str,
+                   tally: UsageTally | None = None):
     """One bounded extract with a validation retry; None when it never validates."""
     messages = [{"role": "user", "content": prompt}]
     for _ in range(_MAX_EXTRACT_ATTEMPTS):
@@ -88,6 +90,8 @@ async def _extract(provider: LLMProvider, prompt: str, schema_model, tool: str):
             tool_name=tool,
             schema=schema_model.model_json_schema(),
         )
+        if tally is not None:
+            tally.add(result)
         try:
             return schema_model.model_validate(result.data)
         except ValidationError as err:
@@ -98,7 +102,8 @@ async def _extract(provider: LLMProvider, prompt: str, schema_model, tool: str):
     return None
 
 
-async def classify(provider: LLMProvider, document: Artifact) -> tuple[str, float]:
+async def classify(provider: LLMProvider, document: Artifact,
+                   tally: UsageTally | None = None) -> tuple[str, float]:
     """Deterministic first; the model only decides what the heuristic could not."""
     verdict = classify_document(file_name=document.file_name or document.title,
                                 text=document.content_md or "")
@@ -110,18 +115,19 @@ async def classify(provider: LLMProvider, document: Artifact) -> tuple[str, floa
         f"{', '.join(DOC_TYPES)}.\n\nFile: {document.file_name or document.title}\n\n"
         f"{(document.content_md or '')[:4000]}"
     )
-    guess = await _extract(provider, prompt, _DocType, "emit_doc_type")
+    guess = await _extract(provider, prompt, _DocType, "emit_doc_type", tally)
     if guess is None or guess.doc_type not in DOC_TYPES:
         return verdict.doc_type, verdict.confidence
     return guess.doc_type, min(0.9, max(guess.confidence, verdict.confidence))
 
 
 async def analyse_document(
-    db: AsyncSession, provider: LLMProvider, package: DocumentPackage, document: Artifact
+    db: AsyncSession, provider: LLMProvider, package: DocumentPackage, document: Artifact,
+    tally: UsageTally | None = None,
 ) -> list[PackageFinding]:
     """Classify one document and extract its findings. Never raises: a document
     the model cannot read leaves the rest of the package analysed."""
-    doc_type, confidence = await classify(provider, document)
+    doc_type, confidence = await classify(provider, document, tally)
     document.doc_type = doc_type
     document.structured_json = {
         **(document.structured_json or {}),
@@ -135,7 +141,7 @@ async def analyse_document(
             f"Document: {document.file_name or document.title} (type: {doc_type})\n"
             f"Section: {section.anchor}\n\n{section.text}"
         )
-        return section, await _extract(provider, prompt, _Findings, "emit_findings")
+        return section, await _extract(provider, prompt, _Findings, "emit_findings", tally)
 
     # Sections do not depend on each other, so read them concurrently. Chained
     # sequentially, a seven-document package was up to 84 model calls behind one
@@ -172,7 +178,8 @@ async def analyse_document(
 
 
 async def analyse_package(
-    db: AsyncSession, provider: LLMProvider, package: DocumentPackage
+    db: AsyncSession, provider: LLMProvider, package: DocumentPackage,
+    tally: UsageTally | None = None,
 ) -> list[PackageFinding]:
     """Analyse every readable document. Re-analysing replaces the previous
     findings for this package so a retry cannot double them (the epic's
@@ -190,7 +197,7 @@ async def analyse_package(
     for document in await package_documents(db, package.id):
         if document.parse_state != "ok":
             continue  # nothing readable to analyse; the row already says why
-        findings.extend(await analyse_document(db, provider, package, document))
+        findings.extend(await analyse_document(db, provider, package, document, tally))
 
     package.status = "analysed"
     await db.flush()
@@ -198,7 +205,8 @@ async def analyse_package(
 
 
 async def analyse_single_document(
-    db: AsyncSession, provider: LLMProvider, package: DocumentPackage, document_id: str
+    db: AsyncSession, provider: LLMProvider, package: DocumentPackage, document_id: str,
+    tally: UsageTally | None = None,
 ) -> list[PackageFinding]:
     """Analyse one document, replacing only *its* findings.
 
@@ -227,7 +235,7 @@ async def analyse_single_document(
         return []  # nothing readable; the document row already says why
 
     package.status = "analysing"
-    findings = await analyse_document(db, provider, package, document)
+    findings = await analyse_document(db, provider, package, document, tally)
     await db.flush()
     return findings
 

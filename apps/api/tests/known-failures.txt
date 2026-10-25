@@ -19,7 +19,6 @@ tests/test_agent_run_api.py::test_create_run_and_retry
 tests/test_agent_run_e2e.py::test_assign_run_gate_approve_e2e
 tests/test_agent_tools_work_items.py::test_build_work_item_registry_has_all_three_tools
 tests/test_email_messages.py::test_invite_email_contains_workspace
-tests/test_llm_debit_coverage.py::test_every_llm_call_site_has_someone_who_pays_for_it
 tests/test_search.py::test_search_scopes_work_items_to_accessible_projects
 tests/test_serializers.py::test_serialize_project_shape
 tests/test_sync_jobs.py::test_sync_endpoints
