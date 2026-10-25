@@ -9,6 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from gigsnano_api.auth.deps import get_current_user
+from gigsnano_api.auth.models import User
 from gigsnano_api.bmad.provider import LLMProvider, get_llm_provider
 from gigsnano_api.core.db import get_db
 from gigsnano_api.features.package_import.analysis import (
@@ -52,6 +54,8 @@ from gigsnano_api.features.package_import.service import (
     package_documents,
 )
 from gigsnano_api.lib.document_classify import DOC_TYPES
+from gigsnano_api.llm.usage import UsageTally, record_tally
+from gigsnano_api.models import ELlmUsageSource
 from gigsnano_api.models.artifacts import Artifact
 from gigsnano_api.models.packages import (
     FINDING_STATUSES,
@@ -187,6 +191,7 @@ async def analyse(
     project: Project = Depends(require_project_write_access),
     provider: LLMProvider = Depends(get_llm_provider),
     db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
 ):
     """Classify and extract findings, replacing previous ones so a retry cannot
     double the analysis.
@@ -198,13 +203,16 @@ async def analyse(
     sees real progress.
     """
     package = await _resolve(db, project, package_id)
+    tally = UsageTally()
     if document_id is not None:
         try:
-            await analyse_single_document(db, provider, package, document_id)
+            await analyse_single_document(db, provider, package, document_id, tally)
         except LookupError as exc:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Document not found") from exc
     else:
-        await analyse_package(db, provider, package)
+        await analyse_package(db, provider, package, tally)
+    await record_tally(db, tally, provider, workspace_id=project.workspace_id, user_id=user.id,
+                       source=ELlmUsageSource.PACKAGE_IMPORT, project_id=project.id)
     await db.commit()
     return _analysis_out(package, await package_findings(db, package.id))
 

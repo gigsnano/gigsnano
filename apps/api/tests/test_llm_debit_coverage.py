@@ -163,6 +163,9 @@ LLM_CALL_SITES: dict[str, str] = {
     "features/automations/compiler.py": "features/automations/router.py",  # bills source=automation
     "features/templates/drafter.py": "features/templates/router.py",       # bills source=template
     "features/roadmap/drafter.py": "features/roadmap/router.py",           # bills source=roadmap
+    "features/meetings/notes.py": "self",  # generate_notes bills source=meeting_notes to the meeting creator
+    "features/package_import/analysis.py": "features/package_import/router.py",  # bills source=package_import
+    "features/voice/turn.py": "self",  # run_voice_turn bills source=voice
     # Deliberately unbilled: internal CLI eval harness. It has no user or
     # workspace to charge, and is not a user-facing operation. It IS our API key,
     # so if it ever runs on a schedule rather than by hand, it needs recording
@@ -171,6 +174,11 @@ LLM_CALL_SITES: dict[str, str] = {
     "context_engine/eval/scoring.py": "UNBILLED: internal CLI eval harness",
     "context_engine/eval/harness.py": "UNBILLED: internal CLI eval harness",
 }
+
+def _records(src: str) -> bool:
+    """`record_tally` is the tally-based wrapper around `record_llm_usage`."""
+    return "record_llm_usage" in src or "record_tally" in src
+
 
 _PROVIDER_CALL = re.compile(r"\.(stream_turn|extract|stream_round)\s*\(")
 
@@ -209,7 +217,7 @@ def test_declared_call_sites_still_exist():
 )
 def test_self_recording_call_sites_actually_record(module):
     src = (SRC / module).read_text(encoding="utf-8")
-    assert "record_llm_usage" in src, f"{module} claims to record its own usage but doesn't"
+    assert _records(src), f"{module} claims to record its own usage but doesn't"
 
 
 @pytest.mark.parametrize(
@@ -225,7 +233,7 @@ def test_self_recording_call_sites_actually_record(module):
 def test_declared_recording_owners_actually_record(owner):
     # Owners are recorded as "path.py" or "path.py + other.py"; check the first.
     src = (SRC / owner).read_text(encoding="utf-8")
-    assert "record_llm_usage" in src, f"{owner} is declared as the payer but never records"
+    assert _records(src), f"{owner} is declared as the payer but never records"
 
 
 def test_record_llm_usage_debits_by_default():

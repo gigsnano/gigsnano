@@ -34,6 +34,12 @@ class ELlmUsageSource(str, enum.Enum):
     TEMPLATE = "template"
     # A persona drafting a roadmap (initiatives/milestones/changelog) (GIN-207).
     ROADMAP = "roadmap"
+    # Summary + action items extracted from a meeting transcript.
+    MEETING_NOTES = "meeting_notes"
+    # Classifying and analysing an imported document package.
+    PACKAGE_IMPORT = "package_import"
+    # Turning one spoken voice-agent utterance into a command.
+    VOICE = "voice"
 
 
 class ELlmUsageOperation(str, enum.Enum):

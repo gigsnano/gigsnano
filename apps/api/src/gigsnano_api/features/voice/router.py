@@ -295,6 +295,7 @@ async def take_turn(
             db, ctx, record, agent, transcript, payload.project_id or None, llm
         ):
             yield sse_event(event)
+        await db.commit()  # persists the turn's LLM usage (and its wallet debit)
         yield SSE_DONE
 
     return StreamingResponse(stream(), media_type=SSE_MEDIA_TYPE, headers=SSE_HEADERS)

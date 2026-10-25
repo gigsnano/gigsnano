@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from gigsnano_api.core.config import settings
 from gigsnano_api.llm.pricing import estimate_cost_usd
 from gigsnano_api.models import ELlmUsageOperation, ELlmUsageSource, LlmUsageEvent
@@ -85,3 +87,51 @@ async def record_llm_usage(
                     await _wallet.debit(db, workspace_id, w.available_cents,
                                         ref_type="ai_usage", ref_id=event.id)
     return event
+
+
+@dataclass
+class UsageTally:
+    """Token totals across the provider calls of one operation (retries included).
+
+    Passed down call chains that have no workspace or user in hand, so the entry
+    point that does can record the operation once with `record_tally`."""
+
+    calls: int = 0
+    input_tokens: int = 0
+    output_tokens: int = 0
+
+    def add(self, result) -> None:
+        self.calls += 1
+        self.input_tokens += result.input_tokens or 0
+        self.output_tokens += result.output_tokens or 0
+
+
+async def record_tally(
+    db,
+    tally: UsageTally,
+    provider,
+    *,
+    workspace_id: str,
+    user_id: str,
+    source: ELlmUsageSource,
+    project_id: str | None = None,
+) -> LlmUsageEvent | None:
+    """Record (and, when billing is on, debit) everything a tally collected.
+    No-op when no provider call happened."""
+    if tally.calls == 0:
+        return None
+    from gigsnano_api.bmad.provider import FakeProvider
+
+    is_fake = isinstance(provider, FakeProvider)
+    return await record_llm_usage(
+        db,
+        workspace_id=workspace_id,
+        user_id=user_id,
+        source=source,
+        operation=ELlmUsageOperation.EXTRACT,
+        model="fake" if is_fake else settings.anthropic_model,
+        input_tokens=tally.input_tokens,
+        output_tokens=tally.output_tokens,
+        project_id=project_id,
+        is_fake=is_fake,
+    )

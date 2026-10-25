@@ -40,7 +40,8 @@ from gigsnano_api.agent.tools.bundles import VOICE_TOOL_ALIASES, registry_for
 from gigsnano_api.bmad.provider import LLMProvider
 from gigsnano_api.features.voice import policy, read, resolver, write
 from gigsnano_api.features.voice.service import VoiceSessionRecord
-from gigsnano_api.models import Agent
+from gigsnano_api.llm.usage import UsageTally, record_tally
+from gigsnano_api.models import Agent, ELlmUsageSource
 from gigsnano_api.shared.context import WorkspaceContext
 from gigsnano_api.voice.commands import (
     Blocked,
@@ -102,7 +103,7 @@ _EXTRACT_SYSTEM = (
 
 
 async def extract_command(
-    provider: LLMProvider, transcript: str, correlation_id: str
+    provider: LLMProvider, transcript: str, correlation_id: str, *, tally: UsageTally | None = None
 ) -> VoiceCommand:
     """Turn one utterance into a validated command. Raises SchemaRejected.
 
@@ -116,6 +117,8 @@ async def extract_command(
         tool_name="voice_command",
         schema=VOICE_COMMAND_SCHEMA,
     )
+    if tally is not None:
+        tally.add(result)
     raw = dict(result.data or {})
     raw.setdefault("utterance", transcript)
     raw["correlation_id"] = correlation_id
@@ -291,15 +294,22 @@ async def run_voice_turn(
     SSE stream: a provider failure mid-turn becomes an `error` event, because an
     unwound stack loses the transcript being held.
     """
+    tally = UsageTally()
+    failure: Exception | None = None
     try:
-        command = await extract_command(provider, transcript, record.session_id)
-    except SchemaRejected:
+        command = await extract_command(provider, transcript, record.session_id, tally=tally)
+    except Exception as exc:  # noqa: BLE001 - a turn fails as an event, not a 500
+        failure = exc
+    # Tokens were spent whether or not the output parsed, so record before branching.
+    await record_tally(db, tally, provider, workspace_id=ctx.workspace.id, user_id=ctx.user.id,
+                       source=ELlmUsageSource.VOICE, project_id=project_id)
+    if isinstance(failure, SchemaRejected):
         yield {"type": "text", "text": "Sorry — I didn't catch that. Say it again?"}
         yield {"type": "error", "code": "schema_rejected", "retryable": True}
         return
-    except Exception as exc:  # noqa: BLE001 - a turn fails as an event, not a 500
+    if failure is not None:
         yield {"type": "text", "text": "Something went wrong on my end."}
-        yield {"type": "error", "code": type(exc).__name__, "retryable": True}
+        yield {"type": "error", "code": type(failure).__name__, "retryable": True}
         return
 
     outcome = triage(command)
