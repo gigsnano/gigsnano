@@ -8,7 +8,12 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from gigsnano_api.billing import wallet as _wallet
-from gigsnano_api.billing.entitlements import ENTITLEMENTS, OVERAGE_CENTS, check_entitlement
+from gigsnano_api.billing.entitlements import (
+    ENTITLEMENTS,
+    OVERAGE_CENTS,
+    check_entitlement,
+    effective_tier,
+)
 from gigsnano_api.billing.subscriptions import get_or_create_subscription
 from gigsnano_api.core.db import utcnow
 from gigsnano_api.models.metering import MeteringEvent
@@ -38,7 +43,7 @@ async def meter(db: AsyncSession, workspace_id: str, key: str) -> None:
     if not quotas:
         return  # not a metered entitlement — just an audit row
     sub = await get_or_create_subscription(db, workspace_id)
-    quota = quotas.get(sub.tier)
+    quota = quotas.get(effective_tier(sub.tier))
     if quota is None:
         return  # unlimited on this tier
     if await usage_this_month(db, workspace_id, key) > quota:
@@ -59,15 +64,16 @@ async def meter(db: AsyncSession, workspace_id: str, key: str) -> None:
 async def entitlement_summary(db: AsyncSession, workspace_id: str) -> list[dict]:
     """Per-key {available, metered, quota, used} for the gating UX (GIN-236)."""
     sub = await get_or_create_subscription(db, workspace_id)
+    tier = effective_tier(sub.tier)
     now = utcnow()
     out = []
     for key, (_min_tier, quotas) in ENTITLEMENTS.items():
         metered = bool(quotas)
         out.append({
             "key": key,
-            "available": check_entitlement(sub.tier, key),
+            "available": check_entitlement(tier, key),
             "metered": metered,
-            "quota": quotas.get(sub.tier) if metered else None,
+            "quota": quotas.get(tier) if metered else None,
             "used": await usage_this_month(db, workspace_id, key, now) if metered else 0,
         })
     return out

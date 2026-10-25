@@ -10,6 +10,7 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from gigsnano_api.billing.subscriptions import get_or_create_subscription
+from gigsnano_api.core.config import settings
 from gigsnano_api.core.db import get_db
 from gigsnano_api.models.billing import EPlanTier
 from gigsnano_api.shared.context import WorkspaceContext, get_workspace_context
@@ -32,6 +33,13 @@ ENTITLEMENTS: dict[str, tuple[EPlanTier, dict[EPlanTier, int | None]]] = {
 
 # Per-action overage price (USD cents) once a metered quota is exceeded.
 OVERAGE_CENTS = {"agent_runs": 10, "automations": 1}
+
+
+def effective_tier(tier: EPlanTier) -> EPlanTier:
+    """The tier entitlements are judged at. Self-hosted installs (BILLING_ENABLED=false)
+    have no plans to buy, so every workspace gets the top tier: nothing paywalled,
+    no metered quota, no overage."""
+    return tier if settings.billing_enabled else EPlanTier.BUSINESS
 
 
 def check_entitlement(tier: EPlanTier, key: str) -> bool:
@@ -58,7 +66,7 @@ def require_entitlement(key: str):
         db: AsyncSession = Depends(get_db),
     ) -> WorkspaceContext:
         sub = await get_or_create_subscription(db, ctx.workspace.id)
-        if not check_entitlement(sub.tier, key):
+        if not check_entitlement(effective_tier(sub.tier), key):
             raise HTTPException(
                 status.HTTP_402_PAYMENT_REQUIRED,
                 f"'{key}' isn't included in your plan — upgrade to unlock.",
