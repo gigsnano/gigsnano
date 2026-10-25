@@ -26,4 +26,4 @@ jobs:
           path-to-signatures: signatures/cla.json
           path-to-document: https://github.com/gigsnano/gigsnano/blob/main/CLA.md
           branch: cla-signatures
-          allowlist: dependabot[bot]
+          allowlist: dependabot[bot],github-actions[bot],rajaaltus
