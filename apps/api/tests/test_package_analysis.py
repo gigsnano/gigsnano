@@ -28,7 +28,7 @@ async def _package(db_session, project, files=None):
     return await create_package(
         db_session,
         project=project,
-        name="OnServe",
+        name="Northwind",
         files=files or [UploadFile(file_name="mobile-spec.md", mime_type="text/markdown",
                                    content=_SPEC)],
     )

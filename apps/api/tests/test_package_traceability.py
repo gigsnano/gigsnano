@@ -29,7 +29,7 @@ _SPEC = "# Mobile spec\n\n## Phase 0\n\nFoundation work: set up CI.\n"
 async def _applied(db_session, project):
     """Upload → analyse → propose → approve → apply, the whole spine."""
     package = await create_package(
-        db_session, project=project, name="OnServe",
+        db_session, project=project, name="Northwind",
         files=[UploadFile(file_name="phases-0-3.md", mime_type="text/markdown",
                           content=_SPEC)],
     )

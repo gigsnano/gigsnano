@@ -28,7 +28,7 @@ async def test_agent_drives_upload_through_apply(app, pat_for_user, seed_project
     project = f"{pat_for_user.workspace_slug}/{seed_project.id}"
 
     package = await tools.upload_project_package(
-        project=project, name="OnServe", files=[_file("phases-0-3.md", _SPEC)]
+        project=project, name="Northwind", files=[_file("phases-0-3.md", _SPEC)]
     )
     assert package["counts"]["ready"] == 1
 

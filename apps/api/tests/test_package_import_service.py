@@ -37,7 +37,7 @@ async def test_plain_files_become_documents_with_provenance(db_session, make_pro
     package = await create_package(
         db_session,
         project=project,
-        name="OnServe",
+        name="Northwind",
         files=[_md("brief.md", "# Brief"), _md("arch.md", "# Architecture")],
         user_id=None,
         user_name="Ada",

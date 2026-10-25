@@ -7,7 +7,7 @@ async def _signup_ws(client, email="ada@example.test", slug="acme"):
     await client.post("/api/workspaces/", json={"name": slug.title(), "slug": slug})
 
 
-async def _project(client, slug="acme", name="OnServe", identifier="ONS"):
+async def _project(client, slug="acme", name="Northwind", identifier="NWD"):
     r = await client.post(
         f"/api/workspaces/{slug}/projects/",
         json={
@@ -28,7 +28,7 @@ async def test_upload_creates_a_package_with_documents(app, client):
     r = await client.post(
         f"/api/workspaces/acme/projects/{pid}/packages/",
         json={
-            "name": "OnServe delivery",
+            "name": "Northwind delivery",
             "files": [
                 {"file_name": "brief.md", "mime_type": "text/markdown", "content": "# Brief"},
                 {"file_name": "arch.md", "mime_type": "text/markdown", "content": "# Arch"},
@@ -37,7 +37,7 @@ async def test_upload_creates_a_package_with_documents(app, client):
     )
     assert r.status_code == 201, r.text
     body = r.json()
-    assert body["name"] == "OnServe delivery"
+    assert body["name"] == "Northwind delivery"
     assert body["counts"] == {"total": 2, "ready": 2, "needs_attention": 0}
     assert {d["file_name"] for d in body["documents"]} == {"brief.md", "arch.md"}
 
@@ -94,7 +94,7 @@ async def test_another_tenant_cannot_read_or_write_the_package(app, client):
     )).status_code == 404
 
 
-async def _upload(client, pid, files, name="OnServe delivery"):
+async def _upload(client, pid, files, name="Northwind delivery"):
     r = await client.post(
         f"/api/workspaces/acme/projects/{pid}/packages/", json={"name": name, "files": files}
     )

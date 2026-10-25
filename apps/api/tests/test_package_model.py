@@ -8,7 +8,7 @@ from gigsnano_api.models.packages import DocumentPackage
 
 async def test_package_groups_its_documents(db_session, make_project):
     project = await make_project()
-    package = DocumentPackage(project_id=project.id, name="OnServe delivery")
+    package = DocumentPackage(project_id=project.id, name="Northwind delivery")
     db_session.add(package)
     await db_session.flush()
 
