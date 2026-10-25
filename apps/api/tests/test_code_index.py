@@ -282,7 +282,7 @@ async def _repo_backed(db_session, **kw):
         identifier="P9",
         cover_image_url="https://img.test/c.jpg",
         flow="existing",
-        repo_full_name="acme/onserve",
+        repo_full_name="acme/northwind",
         clone_status=ECloneStatus.READY,
         **kw,
     )

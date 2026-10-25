@@ -13,7 +13,7 @@ from gigsnano_api.models.stories import Story
 
 async def _package(db_session, project):
     return await create_package(
-        db_session, project=project, name="OnServe",
+        db_session, project=project, name="Northwind",
         files=[UploadFile(file_name="spec.md", mime_type="text/markdown", content="# Spec")],
     )
 
