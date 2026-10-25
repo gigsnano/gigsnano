@@ -27,7 +27,7 @@ jobs:
         working-directory: apps/api
     steps:
       # Full history: the scan diffs against the base branch to find the changed lines.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
